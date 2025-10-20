@@ -23,36 +23,36 @@ import (
 )
 
 type acquireLockOptions struct {
+	additionalAttributes        map[string]*dynamodb.AttributeValue
+	sessionMonitor              *sessionMonitor
 	partitionKey                string
 	data                        []byte
+	refreshPeriod               time.Duration
+	additionalTimeToWaitForLock time.Duration
 	replaceData                 bool
 	deleteLockOnRelease         bool
 	failIfLocked                bool
-	refreshPeriod               time.Duration
-	additionalTimeToWaitForLock time.Duration
-	additionalAttributes        map[string]*dynamodb.AttributeValue
-	sessionMonitor              *sessionMonitor
 }
 
 type getLockOptions struct {
+	start                             time.Time
+	lockTryingToBeAcquired            *Lock
+	sessionMonitor                    *sessionMonitor
+	additionalAttributes              map[string]*dynamodb.AttributeValue
 	partitionKeyName                  string
-	deleteLockOnRelease               bool
+	data                              []byte
 	millisecondsToWait                time.Duration
 	refreshPeriodDuration             time.Duration
-	lockTryingToBeAcquired            *Lock
+	deleteLockOnRelease               bool
 	alreadySleptOnceForOneLeasePeriod bool
-	sessionMonitor                    *sessionMonitor
-	start                             time.Time
 	replaceData                       bool
-	data                              []byte
-	additionalAttributes              map[string]*dynamodb.AttributeValue
 	failIfLocked                      bool
 }
 
 type releaseLockOptions struct {
 	lockItem   *Lock
-	deleteLock bool
 	data       []byte
+	deleteLock bool
 }
 
 type createDynamoDBTableOptions struct {

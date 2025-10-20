@@ -19,8 +19,8 @@ package dynamolock
 import "time"
 
 type sessionMonitor struct {
-	safeTime time.Duration
 	callback func()
+	safeTime time.Duration
 }
 
 func (s *sessionMonitor) timeUntilLeaseEntersDangerZone(lastAbsoluteTime time.Time) time.Duration {

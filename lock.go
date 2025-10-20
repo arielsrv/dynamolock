@@ -26,21 +26,23 @@ import (
 
 // Lock item properly speaking.
 type Lock struct {
-	semaphore sync.Mutex
+	lookupTime time.Time
 
-	client       *Client
-	partitionKey string
+	client         *Client
+	sessionMonitor *sessionMonitor
 
-	data                []byte
+	additionalAttributes map[string]*dynamodb.AttributeValue
+	partitionKey         string
+
 	ownerName           string
+	recordVersionNumber string
+
+	data          []byte
+	leaseDuration time.Duration
+	semaphore     sync.Mutex
+
 	deleteLockOnRelease bool
 	isReleased          bool
-	sessionMonitor      *sessionMonitor
-
-	lookupTime           time.Time
-	recordVersionNumber  string
-	leaseDuration        time.Duration
-	additionalAttributes map[string]*dynamodb.AttributeValue
 }
 
 // Data returns the content of the lock, if any is available.

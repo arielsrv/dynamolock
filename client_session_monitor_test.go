@@ -17,6 +17,7 @@ limitations under the License.
 package dynamolock_test
 
 import (
+	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -28,7 +29,7 @@ import (
 
 func TestSessionMonitor(t *testing.T) {
 	isDynamoLockAvailable(t)
-	t.Parallel()
+
 	svc := dynamodb.New(mustAWSNewSession(t), &aws.Config{
 		Endpoint: aws.String("http://localhost:8000/"),
 		Region:   aws.String("us-west-2"),
@@ -196,7 +197,7 @@ func TestSessionMonitorFullCycle(t *testing.T) {
 	}
 
 	time.Sleep(2 * time.Second)
-	if ok, err := lockedItem.IsAlmostExpired(); err != dynamolock.ErrLockAlreadyReleased {
+	if ok, err := lockedItem.IsAlmostExpired(); !errors.Is(err, dynamolock.ErrLockAlreadyReleased) {
 		t.Error("lockedItem should be already expired:", ok, err)
 	}
 }

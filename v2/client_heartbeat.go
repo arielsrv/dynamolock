@@ -116,7 +116,6 @@ func (c *Client) SendHeartbeatWithContext(ctx context.Context, lockItem *Lock, o
 		return err
 	}
 	return nil
-
 }
 
 func (c *Client) sendHeartbeat(ctx context.Context, options *sendHeartbeatOptions, currentRecordVersionNumber, targetRecordVersionNumber string) error {

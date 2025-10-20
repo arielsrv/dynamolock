@@ -2,11 +2,11 @@ name: Go
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
     paths:
       - 'v2/**'
   pull_request:
-    branches: [master]
+    branches: [ master ]
     paths:
       - 'v2/**'
 
@@ -16,6 +16,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+        shell:
+        run:
+        id:
+        working-directory:
+        env:
+        if:
+        timeout-minutes:
+        continue-on-error: false
 
       - name: Setup Go
         uses: actions/setup-go@v5

@@ -59,11 +59,12 @@ func TestParseDynamoDBError(t *testing.T) {
 	t.Parallel()
 
 	vanilla := errors.New("root error")
-	if err := parseDynamoDBError(vanilla, ""); err != vanilla {
+	if err := parseDynamoDBError(vanilla, ""); !errors.Is(err, vanilla) {
 		t.Error("wrong error wrapping (vanilla):", err)
 	}
 	awserr := awserr.New(dynamodb.ErrCodeConditionalCheckFailedException, "conditional check failed", vanilla)
-	if err, ok := parseDynamoDBError(awserr, "").(*LockNotGrantedError); err == nil || !ok {
+	err := &LockNotGrantedError{}
+	if errors.As(parseDynamoDBError(awserr, ""), &err) {
 		t.Error("wrong error wrapping (awserr):", err)
 	}
 }

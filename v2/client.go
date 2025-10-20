@@ -560,8 +560,8 @@ func (c *Client) putLockItemAndStartSessionMonitor(
 	newLockData []byte,
 	recordVersionNumber string,
 	sessionMonitor *sessionMonitor,
-	putItemRequest *dynamodb.PutItemInput) (*Lock, error) {
-
+	putItemRequest *dynamodb.PutItemInput,
+) (*Lock, error) {
 	lastUpdatedTime := time.Now()
 
 	_, err := c.dynamoDB.PutItem(ctx, putItemRequest)
@@ -680,6 +680,7 @@ func randString() string {
 	}
 	return base32Encoder.EncodeToString(randomBytes)
 }
+
 func (c *Client) heartbeat(rootCtx context.Context) {
 	c.logger.Println(rootCtx, "heartbeats starting")
 	defer c.logger.Println(rootCtx, "heartbeats done")

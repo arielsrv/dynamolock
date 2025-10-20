@@ -123,7 +123,7 @@ func (c *Client) sendHeartbeat(ctx context.Context, options *sendHeartbeatOption
 
 	_, err := c.dynamoDB.UpdateItemWithContext(ctx, updateItemInput)
 	if err != nil {
-		err := parseDynamoDBError(err, "already acquired lock, stopping heartbeats")
+		err = parseDynamoDBError(err, "already acquired lock, stopping heartbeats")
 		var errNotGranted *LockNotGrantedError
 		if errors.As(err, &errNotGranted) {
 			c.locks.Delete(lockItem.uniqueIdentifier())

@@ -62,7 +62,7 @@ func TestIssue56(t *testing.T) {
 		expectedCount             = 100
 	)
 
-	for i := 0; i < expectedCount; i++ {
+	for range expectedCount {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

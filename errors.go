@@ -17,6 +17,7 @@ limitations under the License.
 package dynamolock
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -37,8 +38,8 @@ func (e *TimeoutError) Error() string {
 // LockNotGrantedError indicates that an AcquireLock call has failed to
 // establish a lock because of its current lifecycle state.
 type LockNotGrantedError struct {
-	msg   string
 	cause error
+	msg   string
 }
 
 func (e *LockNotGrantedError) Error() string {
@@ -55,7 +56,8 @@ func (e *LockNotGrantedError) Unwrap() error {
 }
 
 func parseDynamoDBError(err error, msg string) error {
-	if aerr, ok := err.(awserr.Error); ok {
+	var aerr awserr.Error
+	if errors.As(err, &aerr) {
 		switch aerr.Code() {
 		case dynamodb.ErrCodeConditionalCheckFailedException:
 			return &LockNotGrantedError{

@@ -95,13 +95,13 @@ func TestHeartbeatHandover(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		for i := 1; i < 3; i++ {
-			if err := c.SendHeartbeat(lockedItem); err != nil {
+			if err = c.SendHeartbeat(lockedItem); err != nil {
 				t.Log("sendHeartbeat error:", err)
 			}
 			time.Sleep(2 * time.Second)
 		}
 		time.Sleep(1 * time.Second)
-		if err := c.SendHeartbeat(lockedItem); err == nil {
+		if err = c.SendHeartbeat(lockedItem); err == nil {
 			t.Log("the heartbeat must fail after lock is lost")
 		}
 	}()
@@ -176,9 +176,9 @@ func TestHeartbeatDataOps(t *testing.T) {
 	t.Run("delete data on heartbeat", func(t *testing.T) {
 		const lockName = "delete-data-on-heartbeat"
 		data := []byte("some content a")
-		lockedItem, err := c.AcquireLock(lockName, dynamolock.WithData(data), dynamolock.ReplaceData())
-		if err != nil {
-			t.Fatal(err)
+		lockedItem, sErr := c.AcquireLock(lockName, dynamolock.WithData(data), dynamolock.ReplaceData())
+		if sErr != nil {
+			t.Fatal(sErr)
 		}
 
 		t.Log("lock content:", string(lockedItem.Data()))
@@ -186,17 +186,17 @@ func TestHeartbeatDataOps(t *testing.T) {
 			t.Error("losing information inside lock storage, wanted:", string(data), " got:", got)
 		}
 
-		if err := c.SendHeartbeat(lockedItem, dynamolock.DeleteData()); err != nil {
-			t.Fatal("cannot send heartbeat: ", err)
+		if sErr = c.SendHeartbeat(lockedItem, dynamolock.DeleteData()); sErr != nil {
+			t.Fatal("cannot send heartbeat: ", sErr)
 		}
 
-		c2, err := newClient()
-		if err != nil {
+		c2, sErr := newClient()
+		if sErr != nil {
 			t.Fatal("cannot open second lock client")
 		}
-		gotItem, err := c2.Get(lockName)
-		if err != nil {
-			t.Fatal("cannot lock: ", err)
+		gotItem, sErr := c2.Get(lockName)
+		if sErr != nil {
+			t.Fatal("cannot lock: ", sErr)
 		}
 
 		if len(gotItem.Data()) != 0 {
@@ -218,7 +218,7 @@ func TestHeartbeatDataOps(t *testing.T) {
 		}
 
 		replacedData := []byte("some content b")
-		if err := c.SendHeartbeat(lockedItem, dynamolock.ReplaceHeartbeatData(replacedData)); err != nil {
+		if err = c.SendHeartbeat(lockedItem, dynamolock.ReplaceHeartbeatData(replacedData)); err != nil {
 			t.Fatal("cannot send heartbeat: ", err)
 		}
 
@@ -238,21 +238,21 @@ func TestHeartbeatDataOps(t *testing.T) {
 
 	t.Run("racy heartbeats", func(t *testing.T) {
 		const lockName = "racy-heartbeats"
-		lockedItemAlpha, err := c.AcquireLock(lockName)
-		if err != nil {
-			t.Fatal(err)
+		lockedItemAlpha, sErr := c.AcquireLock(lockName)
+		if sErr != nil {
+			t.Fatal(sErr)
 		}
-		if err := c.SendHeartbeat(lockedItemAlpha); err != nil {
-			t.Fatal("cannot send heartbeat: ", err)
+		if sErr = c.SendHeartbeat(lockedItemAlpha); sErr != nil {
+			t.Fatal("cannot send heartbeat: ", sErr)
 		}
 
-		c2, err := newClient()
-		if err != nil {
+		c2, sErr := newClient()
+		if sErr != nil {
 			t.Fatal("cannot open second lock client")
 		}
-		lockedItemBeta, err := c2.AcquireLock(lockName, dynamolock.WithAdditionalTimeToWaitForLock(2*time.Second))
-		if err != nil {
-			t.Fatal(err)
+		lockedItemBeta, sErr := c2.AcquireLock(lockName, dynamolock.WithAdditionalTimeToWaitForLock(2*time.Second))
+		if sErr != nil {
+			t.Fatal(sErr)
 		}
 		if err := c2.SendHeartbeat(lockedItemBeta); err != nil {
 			t.Fatal("cannot send heartbeat: ", err)

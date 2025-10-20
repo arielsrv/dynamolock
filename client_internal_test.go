@@ -33,13 +33,27 @@ type mockDynamoDBClient struct {
 	dynamodbiface.DynamoDBAPI
 }
 
-func (m *mockDynamoDBClient) PutItemWithContext(ctx context.Context, input *dynamodb.PutItemInput, _ ...request.Option) (*dynamodb.PutItemOutput, error) {
+func (m *mockDynamoDBClient) PutItemWithContext(
+	ctx context.Context,
+	input *dynamodb.PutItemInput,
+	_ ...request.Option,
+) (*dynamodb.PutItemOutput, error) {
 	return &dynamodb.PutItemOutput{}, nil
 }
-func (m *mockDynamoDBClient) GetItemWithContext(ctx context.Context, input *dynamodb.GetItemInput, _ ...request.Option) (*dynamodb.GetItemOutput, error) {
+
+func (m *mockDynamoDBClient) GetItemWithContext(
+	ctx context.Context,
+	input *dynamodb.GetItemInput,
+	_ ...request.Option,
+) (*dynamodb.GetItemOutput, error) {
 	return &dynamodb.GetItemOutput{}, nil
 }
-func (m *mockDynamoDBClient) UpdateItemWithContext(ctx context.Context, input *dynamodb.UpdateItemInput, _ ...request.Option) (*dynamodb.UpdateItemOutput, error) {
+
+func (m *mockDynamoDBClient) UpdateItemWithContext(
+	ctx context.Context,
+	input *dynamodb.UpdateItemInput,
+	_ ...request.Option,
+) (*dynamodb.UpdateItemOutput, error) {
 	return &dynamodb.UpdateItemOutput{}, nil
 }
 
@@ -66,7 +80,7 @@ func TestCloseRace(t *testing.T) {
 	n := 500
 
 	// Create goroutines that acquire a lock
-	for i := 0; i < n; i++ {
+	for i := range n {
 		si := i
 		wg.Add(1)
 		go func() {
@@ -98,7 +112,7 @@ func TestCloseRace(t *testing.T) {
 func TestBadCreateLockItem(t *testing.T) {
 	c := &Client{}
 	_, err := c.createLockItem(getLockOptions{}, map[string]*dynamodb.AttributeValue{
-		attrLeaseDuration: &dynamodb.AttributeValue{S: aws.String("bad duration")},
+		attrLeaseDuration: {S: aws.String("bad duration")},
 	})
 	if err == nil {
 		t.Fatal("bad duration should prevent the creation of the lock")

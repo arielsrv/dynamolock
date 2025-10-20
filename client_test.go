@@ -53,7 +53,7 @@ func mustAWSNewSession(t *testing.T) *session.Session {
 
 func TestClientBasicFlow(t *testing.T) {
 	isDynamoLockAvailable(t)
-	t.Parallel()
+
 	svc := dynamodb.New(mustAWSNewSession(t), &aws.Config{
 		Endpoint: aws.String("http://localhost:8000/"),
 		Region:   aws.String("us-west-2"),
@@ -152,7 +152,6 @@ func TestClientBasicFlow(t *testing.T) {
 
 func TestReadLockContent(t *testing.T) {
 	isDynamoLockAvailable(t)
-	t.Parallel()
 
 	t.Run("standard load", func(t *testing.T) {
 		svc := dynamodb.New(mustAWSNewSession(t), &aws.Config{
@@ -439,7 +438,8 @@ func TestFailIfLocked(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, err = c.AcquireLock("failIfLocked", dynamolock.FailIfLocked())
-	if e, ok := err.(*dynamolock.LockNotGrantedError); e == nil || !ok {
+	e := &dynamolock.LockNotGrantedError{}
+	if errors.As(err, &e) {
 		t.Fatal("expected error (LockNotGrantedError) not found:", err)
 		return
 	}
@@ -658,7 +658,7 @@ func TestCustomAdditionalTimeToWaitForLock(t *testing.T) {
 		t.Fatal(err)
 	}
 	go func() {
-		for i := 0; i < 3; i++ {
+		for range 3 {
 			_ = c.SendHeartbeat(l)
 			time.Sleep(time.Second)
 		}
@@ -721,27 +721,27 @@ func TestClientClose(t *testing.T) {
 	}
 
 	t.Log("close after close")
-	if err := c.Close(); err != dynamolock.ErrClientClosed {
+	if err := c.Close(); !errors.Is(err, dynamolock.ErrClientClosed) {
 		t.Error("expected error missing (close after close):", err)
 	}
 	t.Log("heartbeat after close")
-	if err := c.SendHeartbeat(lockItem1); err != dynamolock.ErrClientClosed {
+	if err := c.SendHeartbeat(lockItem1); !errors.Is(err, dynamolock.ErrClientClosed) {
 		t.Error("expected error missing (heartbeat after close):", err)
 	}
 	t.Log("release after close")
-	if _, err := c.ReleaseLock(lockItem1); err != dynamolock.ErrClientClosed {
+	if _, err := c.ReleaseLock(lockItem1); !errors.Is(err, dynamolock.ErrClientClosed) {
 		t.Error("expected error missing (release after close):", err)
 	}
 	t.Log("get after close")
-	if _, err := c.Get("bulkClose1"); err != dynamolock.ErrClientClosed {
+	if _, err := c.Get("bulkClose1"); !errors.Is(err, dynamolock.ErrClientClosed) {
 		t.Error("expected error missing (get after close):", err)
 	}
 	t.Log("acquire after close")
-	if _, err := c.AcquireLock("acquireAfterClose"); err != dynamolock.ErrClientClosed {
+	if _, err := c.AcquireLock("acquireAfterClose"); !errors.Is(err, dynamolock.ErrClientClosed) {
 		t.Error("expected error missing (acquire after close):", err)
 	}
 	t.Log("create table after close")
-	if _, err := c.CreateTable("createTableAfterClose"); err != dynamolock.ErrClientClosed {
+	if _, err := c.CreateTable("createTableAfterClose"); !errors.Is(err, dynamolock.ErrClientClosed) {
 		t.Error("expected error missing (create table after close):", err)
 	}
 }
@@ -776,7 +776,7 @@ func TestInvalidReleases(t *testing.T) {
 
 	t.Run("release nil lock", func(t *testing.T) {
 		var l *dynamolock.Lock
-		if _, err := c.ReleaseLock(l); err == nil {
+		if _, err = c.ReleaseLock(l); err == nil {
 			t.Fatal("nil locks should trigger error on release:", err)
 		} else {
 			t.Log("nil lock:", err)
@@ -785,29 +785,29 @@ func TestInvalidReleases(t *testing.T) {
 
 	t.Run("release empty lock", func(t *testing.T) {
 		emptyLock := &dynamolock.Lock{}
-		if released, err := c.ReleaseLock(emptyLock); err != dynamolock.ErrOwnerMismatched {
-			t.Fatal("empty locks should return error:", err)
+		if released, rErr := c.ReleaseLock(emptyLock); !errors.Is(rErr, dynamolock.ErrOwnerMismatched) {
+			t.Fatal("empty locks should return error:", rErr)
 		} else {
-			t.Log("emptyLock:", released, err)
+			t.Log("emptyLock:", released, rErr)
 		}
 	})
 
 	t.Run("duplicated lock close", func(t *testing.T) {
-		l, err := c.AcquireLock("duplicatedLockRelease")
-		if err != nil {
-			t.Fatal(err)
+		l, aErr := c.AcquireLock("duplicatedLockRelease")
+		if aErr != nil {
+			t.Fatal(aErr)
 		}
-		if err := l.Close(); err != nil {
-			t.Fatal("first close should be flawless:", err)
+		if aErr = l.Close(); aErr != nil {
+			t.Fatal("first close should be flawless:", aErr)
 		}
-		if err := l.Close(); err == nil {
+		if err = l.Close(); err == nil {
 			t.Fatal("second close should be fail")
 		}
 	})
 
 	t.Run("nil lock close", func(t *testing.T) {
 		var l *dynamolock.Lock
-		if err := l.Close(); err != dynamolock.ErrCannotReleaseNullLock {
+		if err = l.Close(); !errors.Is(err, dynamolock.ErrCannotReleaseNullLock) {
 			t.Fatal("wrong error when closing nil lock:", err)
 		}
 	})
@@ -849,7 +849,7 @@ func TestClientWithDataAfterRelease(t *testing.T) {
 	}
 
 	data := []byte("there is life after release")
-	if _, err := c.ReleaseLock(lockItem, dynamolock.WithDataAfterRelease(data)); err != nil {
+	if _, err = c.ReleaseLock(lockItem, dynamolock.WithDataAfterRelease(data)); err != nil {
 		t.Fatal(err)
 	}
 
@@ -908,7 +908,7 @@ func TestHeartbeatLoss(t *testing.T) {
 		t.Fatal(err)
 	}
 	time.Sleep(heartbeatPeriod)
-	if _, err := c.ReleaseLock(lockItem1); err != nil {
+	if _, err = c.ReleaseLock(lockItem1); err != nil {
 		t.Fatal(err)
 	}
 	time.Sleep(heartbeatPeriod)
@@ -973,7 +973,7 @@ func TestHeartbeatError(t *testing.T) {
 	}
 
 	const lockName = "heartbeatError"
-	if _, err := c.AcquireLock(lockName); err != nil {
+	if _, err = c.AcquireLock(lockName); err != nil {
 		fatal(err)
 	}
 	time.Sleep(2 * heartbeatPeriod)
@@ -997,8 +997,8 @@ func TestHeartbeatError(t *testing.T) {
 }
 
 type lockStepBuffer struct {
-	mu  sync.Mutex
 	buf bytes.Buffer
+	mu  sync.Mutex
 }
 
 func (l *lockStepBuffer) Write(p []byte) (int, error) {
@@ -1017,7 +1017,11 @@ type fakeDynamoDB struct {
 	dynamodbiface.DynamoDBAPI
 }
 
-func (f *fakeDynamoDB) GetItemWithContext(context.Context, *dynamodb.GetItemInput, ...request.Option) (*dynamodb.GetItemOutput, error) {
+func (f *fakeDynamoDB) GetItemWithContext(
+	context.Context,
+	*dynamodb.GetItemInput,
+	...request.Option,
+) (*dynamodb.GetItemOutput, error) {
 	return nil, errors.New("service is offline")
 }
 
@@ -1029,7 +1033,7 @@ func TestBadDynamoDB(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if _, err := c.Get("bad-dynamodb"); err == nil {
+		if _, err = c.Get("bad-dynamodb"); err == nil {
 			t.Fatal("expected error missing")
 		}
 	})
