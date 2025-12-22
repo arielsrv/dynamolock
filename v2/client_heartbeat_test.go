@@ -88,13 +88,15 @@ func TestHeartbeatHandover(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Go(func() {
 		for i := 1; i < 3; i++ {
-			if hbErr := c.SendHeartbeat(lockedItem); hbErr != nil {
+			hbErr := c.SendHeartbeat(lockedItem)
+			if hbErr != nil {
 				t.Log("sendHeartbeat error:", hbErr)
 			}
 			time.Sleep(2 * time.Second)
 		}
 		time.Sleep(1 * time.Second)
-		if hbErr := c.SendHeartbeat(lockedItem); hbErr == nil {
+		hbErr := c.SendHeartbeat(lockedItem)
+		if hbErr == nil {
 			t.Log("the heartbeat must fail after lock is lost")
 		}
 	})
@@ -175,7 +177,8 @@ func TestHeartbeatDataOps(t *testing.T) {
 			t.Error("losing information inside lock storage, wanted:", string(data), " got:", got)
 		}
 
-		if hbErr := c.SendHeartbeat(lockedItem, dynamolock.DeleteData()); hbErr != nil {
+		hbErr := c.SendHeartbeat(lockedItem, dynamolock.DeleteData())
+		if hbErr != nil {
 			t.Fatal("cannot send heartbeat: ", hbErr)
 		}
 
@@ -207,7 +210,8 @@ func TestHeartbeatDataOps(t *testing.T) {
 		}
 
 		replacedData := []byte("some content b")
-		if hbErr := c.SendHeartbeat(lockedItem, dynamolock.ReplaceHeartbeatData(replacedData)); hbErr != nil {
+		hbErr := c.SendHeartbeat(lockedItem, dynamolock.ReplaceHeartbeatData(replacedData))
+		if hbErr != nil {
 			t.Fatal("cannot send heartbeat: ", hbErr)
 		}
 
@@ -226,12 +230,14 @@ func TestHeartbeatDataOps(t *testing.T) {
 	})
 
 	t.Run("racy heartbeats", func(t *testing.T) {
+		t.Parallel()
 		const lockName = "racy-heartbeats"
 		lockedItemAlpha, acquireErr := c.AcquireLock(lockName)
 		if acquireErr != nil {
 			t.Fatal(acquireErr)
 		}
-		if hbErr := c.SendHeartbeat(lockedItemAlpha); hbErr != nil {
+		hbErr := c.SendHeartbeat(lockedItemAlpha)
+		if hbErr != nil {
 			t.Fatal("cannot send heartbeat: ", hbErr)
 		}
 
@@ -243,11 +249,13 @@ func TestHeartbeatDataOps(t *testing.T) {
 		if betaErr != nil {
 			t.Fatal(betaErr)
 		}
-		if hbErr := c2.SendHeartbeat(lockedItemBeta); hbErr != nil {
+		hbErr = c2.SendHeartbeat(lockedItemBeta)
+		if hbErr != nil {
 			t.Fatal("cannot send heartbeat: ", hbErr)
 		}
 
-		if hbErr := c.SendHeartbeat(lockedItemAlpha); hbErr == nil {
+		hbErr = c.SendHeartbeat(lockedItemAlpha)
+		if hbErr == nil {
 			t.Fatal("concurrent heartbeats should knock one another out")
 		} else {
 			t.Log("send heartbeat for lockedItemAlpha:", hbErr)
@@ -530,7 +538,8 @@ func TestHeartbeatRetry(t *testing.T) {
 			return nil, errExpected
 		}
 
-		if hbErr := c.SendHeartbeat(lock, dynamolock.HeartbeatRetries(1, 0)); !errors.Is(hbErr, errExpected) {
+		hbErr := c.SendHeartbeat(lock, dynamolock.HeartbeatRetries(1, 0))
+		if !errors.Is(hbErr, errExpected) {
 			t.Fatal("unexpected error:", hbErr)
 		}
 	})

@@ -197,6 +197,7 @@ func TestSortKeyReadLockContent(t *testing.T) {
 		}
 	})
 	t.Run("cached load", func(t *testing.T) {
+		t.Parallel()
 		svc := dynamodb.NewFromConfig(defaultConfig(t))
 		c, err := dynamolock.New(svc,
 			sortKeyTable,
@@ -436,6 +437,7 @@ func TestSortKeyClientWithAdditionalAttributes(t *testing.T) {
 		}
 	})
 	t.Run("recover attributes after release", func(t *testing.T) {
+		t.Parallel()
 		// Cover cirello-io/dynamolock#6
 		lockedItem, acquireErr := c.AcquireLock(
 			"recover attributes after release",
@@ -616,16 +618,19 @@ func TestSortKeyClientClose(t *testing.T) {
 	}
 
 	t.Log("closing client")
-	if closeErr := c.Close(); closeErr != nil {
+	closeErr := c.Close()
+	if closeErr != nil {
 		t.Fatal("cannot close lock client: ", closeErr)
 	}
 
 	t.Log("close after close")
-	if closeErr := c.Close(); !errors.Is(closeErr, dynamolock.ErrClientClosed) {
+	closeErr = c.Close()
+	if !errors.Is(closeErr, dynamolock.ErrClientClosed) {
 		t.Error("expected error missing (close after close):", closeErr)
 	}
 	t.Log("heartbeat after close")
-	if hbErr := c.SendHeartbeat(lockItem1); !errors.Is(hbErr, dynamolock.ErrClientClosed) {
+	hbErr := c.SendHeartbeat(lockItem1)
+	if !errors.Is(hbErr, dynamolock.ErrClientClosed) {
 		t.Error("expected error missing (heartbeat after close):", hbErr)
 	}
 	t.Log("release after close")
@@ -688,17 +693,21 @@ func TestSortKeyInvalidReleases(t *testing.T) {
 		if acquireErr != nil {
 			t.Fatal(acquireErr)
 		}
-		if closeErr := l.Close(); closeErr != nil {
+		closeErr := l.Close()
+		if closeErr != nil {
 			t.Fatal("first close should be flawless:", closeErr)
 		}
-		if closeErr := l.Close(); closeErr == nil {
+		closeErr = l.Close()
+		if closeErr == nil {
 			t.Fatal("second close should be fail")
 		}
 	})
 
 	t.Run("nil lock close", func(t *testing.T) {
+		t.Parallel()
 		var l *dynamolock.Lock
-		if closeErr := l.Close(); !errors.Is(closeErr, dynamolock.ErrCannotReleaseNullLock) {
+		closeErr := l.Close()
+		if !errors.Is(closeErr, dynamolock.ErrCannotReleaseNullLock) {
 			t.Fatal("wrong error when closing nil lock:", closeErr)
 		}
 	})

@@ -716,7 +716,8 @@ func (c *Client) heartbeat(rootCtx context.Context) {
 func (c *Client) heartbeatLock(rootCtx context.Context, lockItem *Lock) {
 	ctx, cancel := context.WithTimeout(rootCtx, c.heartbeatPeriod)
 	defer cancel()
-	if err := c.SendHeartbeatWithContext(ctx, lockItem); err != nil {
+	err := c.SendHeartbeatWithContext(ctx, lockItem)
+	if err != nil {
 		c.logger.Println(ctx, "error sending heartbeat to", lockItem.partitionKey, ":", err)
 	}
 }

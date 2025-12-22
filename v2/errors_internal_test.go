@@ -39,6 +39,7 @@ func TestLockNotGrantedError(t *testing.T) {
 		}
 	})
 	t.Run("not granted with cause", func(t *testing.T) {
+		t.Parallel()
 		const expectedAge = 5 * time.Minute
 		notGranted := &LockNotGrantedError{
 			msg:   "not granted with cause",
