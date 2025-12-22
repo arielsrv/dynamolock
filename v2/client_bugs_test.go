@@ -59,25 +59,23 @@ func TestIssue56(t *testing.T) {
 		expectedCount             = 100
 	)
 
-	for i := 0; i < expectedCount; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range expectedCount {
+		wg.Go(func() {
 			for {
-				lock, err := lockClient.AcquireLock(
+				lock, acquireErr := lockClient.AcquireLock(
 					"key",
 					dynamolock.WithAdditionalTimeToWaitForLock(expectedTimeoutMinimumAge),
 					dynamolock.WithRefreshPeriod(100*time.Millisecond),
 				)
-				switch err {
+				switch acquireErr {
 				case nil:
 					count++
 					_, _ = lockClient.ReleaseLock(lock)
 					return
 				default:
 					var errTimeout *dynamolock.TimeoutError
-					if !errors.As(err, &errTimeout) {
-						t.Error("unexpected error:", err)
+					if !errors.As(acquireErr, &errTimeout) {
+						t.Error("unexpected error:", acquireErr)
 						return
 					}
 					if errTimeout.Age < expectedTimeoutMinimumAge {
@@ -86,7 +84,7 @@ func TestIssue56(t *testing.T) {
 					}
 				}
 			}
-		}()
+		})
 	}
 
 	wg.Wait()

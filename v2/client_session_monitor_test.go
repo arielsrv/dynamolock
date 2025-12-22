@@ -176,10 +176,10 @@ func TestSessionMonitorFullCycle(t *testing.T) {
 	}
 
 	time.Sleep(2 * time.Second)
-	if ok, err := lockedItem.IsAlmostExpired(); err == nil && !ok {
+	if ok, almostExpiredErr := lockedItem.IsAlmostExpired(); almostExpiredErr == nil && !ok {
 		t.Fatal("lock is not yet in the danger zone")
-	} else if err != nil {
-		t.Fatal("cannot assert whether the lock is almost expired:", err)
+	} else if almostExpiredErr != nil {
+		t.Fatal("cannot assert whether the lock is almost expired:", almostExpiredErr)
 	}
 
 	mu.Lock()
@@ -190,8 +190,11 @@ func TestSessionMonitorFullCycle(t *testing.T) {
 	}
 
 	time.Sleep(2 * time.Second)
-	if ok, err := lockedItem.IsAlmostExpired(); !errors.Is(err, dynamolock.ErrLockAlreadyReleased) {
-		t.Error("lockedItem should be already expired:", ok, err)
+	if ok, almostExpiredErr := lockedItem.IsAlmostExpired(); !errors.Is(
+		almostExpiredErr,
+		dynamolock.ErrLockAlreadyReleased,
+	) {
+		t.Error("lockedItem should be already expired:", ok, almostExpiredErr)
 	}
 }
 
@@ -208,7 +211,6 @@ func TestSessionMonitorMissedCall(t *testing.T) {
 		{20 * time.Second, 5 * time.Second},
 	}
 	for _, tt := range cases {
-		tt := tt
 		safeZone := tt.leaseDuration - (3 * tt.heartbeatPeriod)
 		t.Run(fmt.Sprintf("%s/%s/%s", tt.leaseDuration, tt.heartbeatPeriod, safeZone), func(t *testing.T) {
 			t.Parallel()

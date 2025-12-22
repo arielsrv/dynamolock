@@ -17,7 +17,6 @@ import (
 // `if errors.Is(err, ctx.Err()) { return ctx.Err() }` branch that was not fully
 // covered.
 func TestHeartbeatImmediateContextCancel(t *testing.T) {
-
 	svc := &interceptedDynamoDBClient{
 		DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 	}

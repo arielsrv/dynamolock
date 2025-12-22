@@ -1,27 +1,5 @@
 linters:
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	golangci-lint -j 1 run --disable-all \
-		--exclude ".*Load returns interface.*" \
-		-E "errcheck" \
-		-E "errname" \
-		-E "errorlint" \
-		-E "exhaustive" \
-		-E "gci" \
-		-E "gocritic" \
-		-E "godot" \
-		-E "gofmt" \
-		-E "goimports" \
-		-E "govet" \
-		-E "grouper" \
-		-E "ineffassign" \
-		-E "misspell" \
-		-E "prealloc" \
-		-E "predeclared" \
-		-E "staticcheck" \
-		-E "thelper" \
-		-E "unparam" \
-		-E "unused" \
-		./...
+	go tool golangci-lint run
 
 local-dynamodb:
 	mkdir local-dynamodb
@@ -29,7 +7,7 @@ local-dynamodb:
 	(cd local-dynamodb; unzip latest.zip)
 
 test: local-dynamodb
-	GOEXPERIMENT=loopvar go test -v
+	go test -v
 
 test-race:
-	GOEXPERIMENT=loopvar go test -race -count=1000
+	go test -race -count=1000
