@@ -3,10 +3,10 @@ module cirello.io/dynamolock/v2
 go 1.25.5
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.41.0
+	github.com/aws/aws-sdk-go-v2 v1.41.1
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.6
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.8.29
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.53.5
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.8.30
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.53.6
 )
 
 require (
@@ -36,12 +36,12 @@ require (
 	github.com/alingse/nilnesserr v0.2.0 // indirect
 	github.com/ashanbrown/forbidigo/v2 v2.3.0 // indirect
 	github.com/ashanbrown/makezero/v2 v2.1.0 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.20.29 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.16 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.16 // indirect
-	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.32.9 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.20.30 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.17 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.17 // indirect
+	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.32.10 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.11.16 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.11.17 // indirect
 	github.com/aws/smithy-go v1.24.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
