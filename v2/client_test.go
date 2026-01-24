@@ -33,11 +33,12 @@ import (
 	"testing"
 	"time"
 
-	"cirello.io/dynamolock/v2"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+
+	"cirello.io/dynamolock/v2"
 )
 
 func TestMain(m *testing.M) {
