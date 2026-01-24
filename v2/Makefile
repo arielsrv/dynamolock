@@ -1,5 +1,6 @@
 linters:
 	go tool golangci-lint run --fix
+	go tool gofumpt -w -l .
 
 local-dynamodb:
 	mkdir local-dynamodb
