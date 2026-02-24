@@ -75,7 +75,7 @@ type contextLoggerAdapter struct {
 }
 
 func (cla *contextLoggerAdapter) Println(_ context.Context, v ...any) {
-	cla.logger.Println(v)
+	cla.logger.Println(v...)
 }
 
 // Client is a dynamoDB based distributed lock client.

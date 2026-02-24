@@ -102,8 +102,7 @@ func TestHeartbeatConditionalCheckFailedTransformsError(t *testing.T) {
 	}
 
 	err = c.SendHeartbeat(lock, dynamolock.HeartbeatRetries(0, 0))
-	var lng *dynamolock.LockNotGrantedError
-	if !errors.As(err, &lng) {
+	if _, ok := errors.AsType[*dynamolock.LockNotGrantedError](err); !ok {
 		t.Fatalf("expected LockNotGrantedError, got %v", err)
 	}
 }
