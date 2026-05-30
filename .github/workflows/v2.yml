@@ -22,12 +22,6 @@ jobs:
         with:
           go-version: "stable"
 
-      - name: Download DynamoDB Local
-        working-directory: v2/
-        run: |
-          set -e
-          make local-dynamodb
-
       - name: Test
         working-directory: v2/
         run: |
