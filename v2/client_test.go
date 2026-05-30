@@ -20,14 +20,12 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"log"
 	"math/rand"
 	"net"
 	"os"
-	"os/exec"
 	"strings"
 	"sync"
 	"testing"
@@ -37,46 +35,42 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/wait"
 
 	"cirello.io/dynamolock/v2"
 )
 
+var (
+	dynamoEndpoint string
+	dynamoHostPort string
+)
+
 func TestMain(m *testing.M) {
-	flag.Parse()
-	javaPath, err := exec.LookPath("java")
+	ctx := context.Background()
+	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: testcontainers.ContainerRequest{
+			Image:        "amazon/dynamodb-local:latest",
+			ExposedPorts: []string{"8000/tcp"},
+			WaitingFor:   wait.ForListeningPort("8000/tcp"),
+		},
+		Started: true,
+	})
 	if err != nil {
-		panic("cannot execute tests without Java")
+		panic("cannot start DynamoDB container: " + err.Error())
 	}
-	ctx, cancel := context.WithCancel(context.Background())
-	cmd := exec.CommandContext(
-		ctx,
-		javaPath,
-		"-Djava.library.path=./DynamoDBLocal_lib",
-		"-jar",
-		"DynamoDBLocal.jar",
-		"-sharedDb",
-		"-inMemory",
-	)
-	cmd.Dir = "local-dynamodb"
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	startErr := cmd.Start()
-	if startErr != nil {
-		panic("cannot start local dynamodb:" + startErr.Error())
+	host, err := container.Host(ctx)
+	if err != nil {
+		panic("cannot get DynamoDB container host: " + err.Error())
 	}
-	for range 10 {
-		conn, dialErr := net.Dial("tcp", "localhost:8000")
-		if dialErr != nil {
-			time.Sleep(1 * time.Second)
-			continue
-		}
-		conn.Close()
-		break
+	port, err := container.MappedPort(ctx, "8000")
+	if err != nil {
+		panic("cannot get DynamoDB container port: " + err.Error())
 	}
-	time.Sleep(1 * time.Second)
+	dynamoHostPort = host + ":" + port.Port()
+	dynamoEndpoint = "http://" + dynamoHostPort + "/"
 	exitCode := m.Run()
-	cancel()
-	_ = cmd.Wait()
+	_ = container.Terminate(ctx)
 	os.Exit(exitCode)
 }
 
@@ -84,7 +78,7 @@ func defaultConfig(t *testing.T) aws.Config {
 	t.Helper()
 	return aws.Config{
 		Region:       "us-west-2",
-		BaseEndpoint: aws.String("http://localhost:8000/"),
+		BaseEndpoint: aws.String(dynamoEndpoint),
 		Credentials: credentials.StaticCredentialsProvider{
 			Value: aws.Credentials{
 				AccessKeyID:     "fakeMyKeyId",
@@ -121,7 +115,7 @@ func proxyConfig(t *testing.T) (aws.Config, func()) {
 			if acceptErr != nil {
 				return
 			}
-			outboundConn, dialErr := net.Dial("tcp4", "localhost:8000")
+			outboundConn, dialErr := net.Dial("tcp4", dynamoHostPort)
 			if dialErr != nil {
 				return
 			}

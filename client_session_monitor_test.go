@@ -27,10 +27,9 @@ import (
 )
 
 func TestSessionMonitor(t *testing.T) {
-	isDynamoLockAvailable(t)
 	t.Parallel()
 	svc := dynamodb.New(mustAWSNewSession(t), &aws.Config{
-		Endpoint: aws.String("http://localhost:8000/"),
+		Endpoint: aws.String(dynamoEndpoint),
 		Region:   aws.String("us-west-2"),
 	})
 	c, err := dynamolock.New(svc,
@@ -84,10 +83,9 @@ func TestSessionMonitor(t *testing.T) {
 }
 
 func TestSessionMonitorRemoveBeforeExpiration(t *testing.T) {
-	isDynamoLockAvailable(t)
 	t.Parallel()
 	svc := dynamodb.New(mustAWSNewSession(t), &aws.Config{
-		Endpoint: aws.String("http://localhost:8000/"),
+		Endpoint: aws.String(dynamoEndpoint),
 		Region:   aws.String("us-west-2"),
 	})
 	c, err := dynamolock.New(svc,
@@ -140,10 +138,9 @@ func TestSessionMonitorRemoveBeforeExpiration(t *testing.T) {
 }
 
 func TestSessionMonitorFullCycle(t *testing.T) {
-	isDynamoLockAvailable(t)
 	t.Parallel()
 	svc := dynamodb.New(mustAWSNewSession(t), &aws.Config{
-		Endpoint: aws.String("http://localhost:8000/"),
+		Endpoint: aws.String(dynamoEndpoint),
 		Region:   aws.String("us-west-2"),
 	})
 	c, err := dynamolock.New(svc,

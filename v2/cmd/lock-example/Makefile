@@ -3,22 +3,18 @@
 
 # Binary name
 BINARY=lock-example
-DYNAMO_DIR=../../local-dynamodb
 
 build:
 	go build -o $(BINARY) main.go
 
 run-dynamodb:
-	@echo "Starting DynamoDB Local..."
-	cd $(DYNAMO_DIR) && java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb -inMemory & echo $$! > dynamodb.pid
+	@echo "Starting DynamoDB Local via Docker..."
+	docker run -d --name dynamodb-local -p 8000:8000 amazon/dynamodb-local:latest
+	@echo "DynamoDB Local started on port 8000"
 
 stop-dynamodb:
-	@if [ -f $(DYNAMO_DIR)/dynamodb.pid ]; then \
-		echo "Stopping DynamoDB Local..."; \
-		kill $$(cat $(DYNAMO_DIR)/dynamodb.pid) && rm $(DYNAMO_DIR)/dynamodb.pid; \
-	else \
-		echo "DynamoDB Local pid file not found."; \
-	fi
+	@echo "Stopping DynamoDB Local..."
+	docker stop dynamodb-local && docker rm dynamodb-local
 
 run-example: build
 	@echo "Running example..."
