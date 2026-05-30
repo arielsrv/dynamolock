@@ -19,6 +19,23 @@ go build -o lock-example ./cmd/lock-example/main.go
 ./lock-example --table my-locks my-unique-lock sleep 5
 ```
 
+## Makefile
+
+A `Makefile` is provided to simplify running the example with a local DynamoDB instance.
+
+From the `v2/cmd/lock-example` directory:
+
+```bash
+# Start DynamoDB Local in background
+make run-dynamodb
+
+# Build and run the example
+make run-example
+
+# Stop DynamoDB Local
+make stop-dynamodb
+```
+
 ## Options
 
 - `--table`: DynamoDB table name (default "locks").

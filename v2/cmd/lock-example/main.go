@@ -71,7 +71,18 @@ func main() {
 }
 
 func dialDynamoDB(ctx context.Context, tableName string) (*dynamolock.Client, error) {
-	cfg, err := config.LoadDefaultConfig(ctx)
+	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+		if service == dynamodb.ServiceID && os.Getenv("DYNAMODB_ENDPOINT") != "" {
+			return aws.Endpoint{
+				URL:           os.Getenv("DYNAMODB_ENDPOINT"),
+				SigningRegion: region,
+			}, nil
+		}
+		// returning EndpointNotFoundError will allow the service to fallback to its default resolution
+		return aws.Endpoint{}, &aws.EndpointNotFoundError{}
+	})
+
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithEndpointResolverWithOptions(customResolver))
 	if err != nil {
 		return nil, fmt.Errorf("cannot load AWS config: %w", err)
 	}
