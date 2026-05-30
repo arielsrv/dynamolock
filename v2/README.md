@@ -179,4 +179,14 @@ perform all of the following actions on the DynamoDB table containing the locks:
 * `UpdateItem`
 * `DeleteItem`
 * `CreateTable`
+* `DescribeTable`
+* `ListTables`
+* `UpdateTable`
+* `DeleteTable`
+* `DescribeTimeToLive`
+* `UpdateTimeToLive`
+* `TagResource`
+* `UntagResource`
+* `ListTagsOfResource`
+* `BatchGetItem`
 
