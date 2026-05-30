@@ -14,28 +14,35 @@ jobs:
   golangci:
     name: lint
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: v2/
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: '1.26.3'
+          go-version: '1.23.x'
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v9
+        uses: golangci/golangci-lint-action@v6
         with:
           version: latest
+          working-directory: v2/
 
   build:
+    needs: golangci
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: v2/
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.26.3'
+          go-version: '1.23.x'
 
       - name: Test
-        working-directory: v2/
         run: |
-          make test    
+          make test
