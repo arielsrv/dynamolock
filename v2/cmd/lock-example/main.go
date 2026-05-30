@@ -10,12 +10,13 @@ import (
 	"os/signal"
 	"time"
 
-	"cirello.io/dynamolock/v2"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/urfave/cli/v2"
+
+	"cirello.io/dynamolock/v2"
 )
 
 func main() {
@@ -52,7 +53,7 @@ func main() {
 			}
 			defer client.Close()
 
-			if err := createTable(ctx, client, tableName); err != nil {
+			if err = createTable(ctx, client, tableName); err != nil {
 				return err
 			}
 
@@ -71,24 +72,17 @@ func main() {
 }
 
 func dialDynamoDB(ctx context.Context, tableName string) (*dynamolock.Client, error) {
-	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
-		if service == dynamodb.ServiceID && os.Getenv("DYNAMODB_ENDPOINT") != "" {
-			return aws.Endpoint{
-				URL:           os.Getenv("DYNAMODB_ENDPOINT"),
-				SigningRegion: region,
-			}, nil
-		}
-		// returning EndpointNotFoundError will allow the service to fallback to its default resolution
-		return aws.Endpoint{}, &aws.EndpointNotFoundError{}
-	})
-
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithEndpointResolverWithOptions(customResolver))
+	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load AWS config: %w", err)
 	}
 
 	client, err := dynamolock.New(
-		dynamodb.NewFromConfig(cfg),
+		dynamodb.NewFromConfig(cfg, func(o *dynamodb.Options) {
+			if os.Getenv("DYNAMODB_ENDPOINT") != "" {
+				o.BaseEndpoint = aws.String(os.Getenv("DYNAMODB_ENDPOINT"))
+			}
+		}),
 		tableName,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -101,7 +95,8 @@ func dialDynamoDB(ctx context.Context, tableName string) (*dynamolock.Client, er
 }
 
 func createTable(ctx context.Context, client *dynamolock.Client, tableName string) error {
-	_, err := client.CreateTableWithContext(ctx, tableName,
+	_, err := client.CreateTableWithContext(
+		ctx, tableName,
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -109,8 +104,7 @@ func createTable(ctx context.Context, client *dynamolock.Client, tableName strin
 		dynamolock.WithCustomPartitionKeyName("key"),
 	)
 	if err != nil {
-		var re *types.ResourceInUseException
-		if errors.As(err, &re) {
+		if _, ok := errors.AsType[*types.ResourceInUseException](err); ok {
 			return nil
 		}
 		return fmt.Errorf("cannot create dynamolock client table: %w", err)

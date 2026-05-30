@@ -83,12 +83,8 @@ func TestMain(m *testing.M) {
 func defaultConfig(t *testing.T) aws.Config {
 	t.Helper()
 	return aws.Config{
-		Region: "us-west-2",
-		EndpointResolverWithOptions: aws.EndpointResolverWithOptionsFunc(
-			func(service, region string, options ...any) (aws.Endpoint, error) { //nolint:staticcheck
-				return aws.Endpoint{URL: "http://localhost:8000/"}, nil //nolint:staticcheck
-			},
-		),
+		Region:       "us-west-2",
+		BaseEndpoint: aws.String("http://localhost:8000/"),
 		Credentials: credentials.StaticCredentialsProvider{
 			Value: aws.Credentials{
 				AccessKeyID:     "fakeMyKeyId",
@@ -135,12 +131,8 @@ func proxyConfig(t *testing.T) (aws.Config, func()) {
 		}
 	}()
 	return aws.Config{
-		Region: "us-west-2",
-		EndpointResolverWithOptions: aws.EndpointResolverWithOptionsFunc(
-			func(service, region string, options ...any) (aws.Endpoint, error) { //nolint:staticcheck
-				return aws.Endpoint{URL: "http://" + l.Addr().String() + "/"}, nil //nolint:staticcheck
-			},
-		),
+		Region:       "us-west-2",
+		BaseEndpoint: aws.String("http://" + l.Addr().String() + "/"),
 		Credentials: credentials.StaticCredentialsProvider{
 			Value: aws.Credentials{
 				AccessKeyID:     "fakeMyKeyId",
