@@ -21,7 +21,8 @@ func TestHeartbeatImmediateContextCancel(t *testing.T) {
 	svc := &interceptedDynamoDBClient{
 		DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 	}
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"immediateCancel",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithOwnerName("TestHeartbeatImmediateContextCancel"),
@@ -33,7 +34,8 @@ func TestHeartbeatImmediateContextCancel(t *testing.T) {
 	}
 
 	// Ensure table exists
-	_, _ = c.CreateTable("immediateCancel",
+	_, _ = c.CreateTable(
+		"immediateCancel",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -71,7 +73,8 @@ func TestHeartbeatConditionalCheckFailedTransformsError(t *testing.T) {
 	svc := &interceptedDynamoDBClient{
 		DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 	}
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"condCheckFailed",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithOwnerName("TestHeartbeatCCF"),
@@ -83,7 +86,8 @@ func TestHeartbeatConditionalCheckFailedTransformsError(t *testing.T) {
 	}
 
 	// Ensure table exists
-	_, _ = c.CreateTable("condCheckFailed",
+	_, _ = c.CreateTable(
+		"condCheckFailed",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),

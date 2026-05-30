@@ -47,7 +47,8 @@ func TestCloseRace(t *testing.T) {
 		},
 	}
 	// Most of the input into New isn't relevant since we're mocking
-	lockClient, err := New(mockSvc, "locksCloseRace",
+	lockClient, err := New(
+		mockSvc, "locksCloseRace",
 		WithLeaseDuration(3*time.Second),
 		WithHeartbeatPeriod(100*time.Millisecond),
 		WithOwnerName("CloseRace"),

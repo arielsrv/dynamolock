@@ -36,7 +36,8 @@ import (
 func TestSessionMonitor(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithOwnerName("TestSessionMonitor#1"),
@@ -48,7 +49,8 @@ func TestSessionMonitor(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -61,7 +63,8 @@ func TestSessionMonitor(t *testing.T) {
 		sessionMonitorWasTriggered bool
 	)
 	data := []byte("some content a")
-	lockedItem, err := c.AcquireLock("uhura",
+	lockedItem, err := c.AcquireLock(
+		"uhura",
 		dynamolock.WithData(data),
 		dynamolock.ReplaceData(),
 		dynamolock.WithSessionMonitor(500*time.Millisecond, func() {
@@ -89,7 +92,8 @@ func TestSessionMonitor(t *testing.T) {
 func TestSessionMonitorRemoveBeforeExpiration(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks-monitor",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithOwnerName("TestSessionMonitorRemoveBeforeExpiration#1"),
@@ -101,7 +105,8 @@ func TestSessionMonitorRemoveBeforeExpiration(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks-monitor",
+	_, _ = c.CreateTable(
+		"locks-monitor",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -114,7 +119,8 @@ func TestSessionMonitorRemoveBeforeExpiration(t *testing.T) {
 		sessionMonitorWasTriggered bool
 	)
 	data := []byte("some content a")
-	lockedItem, err := c.AcquireLock("scotty",
+	lockedItem, err := c.AcquireLock(
+		"scotty",
 		dynamolock.WithData(data),
 		dynamolock.ReplaceData(),
 		dynamolock.WithSessionMonitor(50*time.Millisecond, func() {
@@ -141,7 +147,8 @@ func TestSessionMonitorRemoveBeforeExpiration(t *testing.T) {
 func TestSessionMonitorFullCycle(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithOwnerName("TestSessionMonitorFullCycle#1"),
@@ -153,7 +160,8 @@ func TestSessionMonitorFullCycle(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -165,7 +173,8 @@ func TestSessionMonitorFullCycle(t *testing.T) {
 		mu                         sync.Mutex
 		sessionMonitorWasTriggered bool
 	)
-	lockedItem, err := c.AcquireLock("sessionMonitor",
+	lockedItem, err := c.AcquireLock(
+		"sessionMonitor",
 		dynamolock.WithSessionMonitor(1*time.Second, func() {
 			mu.Lock()
 			sessionMonitorWasTriggered = true
@@ -219,7 +228,8 @@ func TestSessionMonitorMissedCall(t *testing.T) {
 			t.Log("lockName:", lockName)
 			cfg, proxyCloser := proxyConfig(t)
 			svc := dynamodb.NewFromConfig(cfg)
-			c, err := dynamolock.New(svc,
+			c, err := dynamolock.New(
+				svc,
 				"locks",
 				dynamolock.WithLeaseDuration(tt.leaseDuration),
 				dynamolock.WithOwnerName("TestSessionMonitorMissedCall#1"),
@@ -232,7 +242,8 @@ func TestSessionMonitorMissedCall(t *testing.T) {
 			}
 
 			t.Log("ensuring table exists")
-			_, _ = c.CreateTable("locks",
+			_, _ = c.CreateTable(
+				"locks",
 				dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 					ReadCapacityUnits:  aws.Int64(5),
 					WriteCapacityUnits: aws.Int64(5),
@@ -243,7 +254,8 @@ func TestSessionMonitorMissedCall(t *testing.T) {
 			sessionMonitorWasTriggered := make(chan struct{})
 
 			data := []byte("some content a")
-			lockedItem, err := c.AcquireLock(lockName,
+			lockedItem, err := c.AcquireLock(
+				lockName,
 				dynamolock.WithData(data),
 				dynamolock.ReplaceData(),
 				dynamolock.WithSessionMonitor(safeZone, func() {

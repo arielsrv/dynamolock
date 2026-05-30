@@ -63,7 +63,10 @@ func TestParseDynamoDBError(t *testing.T) {
 	if err := parseDynamoDBError(vanilla, ""); !errors.Is(err, vanilla) {
 		t.Error("wrong error wrapping (vanilla):", err)
 	}
-	awserr := fmt.Errorf("envelope: %w", &types.ConditionalCheckFailedException{Message: new("conditional check failed")})
+	awserr := fmt.Errorf(
+		"envelope: %w",
+		&types.ConditionalCheckFailedException{Message: new("conditional check failed")},
+	)
 	err := parseDynamoDBError(awserr, "")
 	if !isLockNotGrantedError(err) {
 		t.Error("wrong error wrapping (awserr):", err)

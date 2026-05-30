@@ -39,7 +39,8 @@ const (
 
 func createSortKeyTable(t *testing.T, c *dynamolock.Client) (*dynamodb.CreateTableOutput, error) {
 	t.Helper()
-	return c.CreateTable(sortKeyTable,
+	return c.CreateTable(
+		sortKeyTable,
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -52,7 +53,8 @@ func createSortKeyTable(t *testing.T, c *dynamolock.Client) (*dynamodb.CreateTab
 func TestSortKeyClientBasicFlow(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -69,7 +71,8 @@ func TestSortKeyClientBasicFlow(t *testing.T) {
 	_, _ = createSortKeyTable(t, c)
 
 	data := []byte("some content a")
-	lockedItem, err := c.AcquireLock("spock",
+	lockedItem, err := c.AcquireLock(
+		"spock",
 		dynamolock.WithData(data),
 		dynamolock.ReplaceData(),
 	)
@@ -93,7 +96,8 @@ func TestSortKeyClientBasicFlow(t *testing.T) {
 	t.Log("done")
 
 	data2 := []byte("some content b")
-	lockedItem2, err := c.AcquireLock("spock",
+	lockedItem2, err := c.AcquireLock(
+		"spock",
 		dynamolock.WithData(data2),
 		dynamolock.ReplaceData(),
 	)
@@ -106,7 +110,8 @@ func TestSortKeyClientBasicFlow(t *testing.T) {
 		t.Error("losing information inside lock storage, wanted:", string(data2), " got:", got)
 	}
 
-	c2, err := dynamolock.New(svc,
+	c2, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -117,7 +122,8 @@ func TestSortKeyClientBasicFlow(t *testing.T) {
 		t.Fatal(err)
 	}
 	data3 := []byte("some content c")
-	_, err = c2.AcquireLock("spock",
+	_, err = c2.AcquireLock(
+		"spock",
 		dynamolock.WithData(data3),
 		dynamolock.ReplaceData(),
 	)
@@ -127,7 +133,8 @@ func TestSortKeyClientBasicFlow(t *testing.T) {
 
 	_, _ = c.ReleaseLock(lockedItem, dynamolock.WithDeleteLock(true))
 
-	lockedItem3, err := c2.AcquireLock("spock",
+	lockedItem3, err := c2.AcquireLock(
+		"spock",
 		dynamolock.WithData(data3),
 		dynamolock.ReplaceData(),
 	)
@@ -145,7 +152,8 @@ func TestSortKeyReadLockContent(t *testing.T) {
 
 	t.Run("standard load", func(t *testing.T) {
 		svc := dynamodb.NewFromConfig(defaultConfig(t))
-		c, err := dynamolock.New(svc,
+		c, err := dynamolock.New(
+			svc,
 			sortKeyTable,
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -162,7 +170,8 @@ func TestSortKeyReadLockContent(t *testing.T) {
 		_, _ = createSortKeyTable(t, c)
 
 		data := []byte("some content a")
-		lockedItem, err := c.AcquireLock("mccoy",
+		lockedItem, err := c.AcquireLock(
+			"mccoy",
 			dynamolock.WithData(data),
 			dynamolock.ReplaceData(),
 		)
@@ -175,7 +184,8 @@ func TestSortKeyReadLockContent(t *testing.T) {
 			t.Error("losing information inside lock storage, wanted:", string(data), " got:", got)
 		}
 
-		c2, err := dynamolock.New(svc,
+		c2, err := dynamolock.New(
+			svc,
 			sortKeyTable,
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -200,7 +210,8 @@ func TestSortKeyReadLockContent(t *testing.T) {
 	t.Run("cached load", func(t *testing.T) {
 		t.Parallel()
 		svc := dynamodb.NewFromConfig(defaultConfig(t))
-		c, err := dynamolock.New(svc,
+		c, err := dynamolock.New(
+			svc,
 			sortKeyTable,
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -217,7 +228,8 @@ func TestSortKeyReadLockContent(t *testing.T) {
 		_, _ = createSortKeyTable(t, c)
 
 		data := []byte("hello janice")
-		lockedItem, err := c.AcquireLock("janice",
+		lockedItem, err := c.AcquireLock(
+			"janice",
 			dynamolock.WithData(data),
 			dynamolock.ReplaceData(),
 		)
@@ -237,7 +249,8 @@ func TestSortKeyReadLockContent(t *testing.T) {
 func TestSortKeyReadLockContentAfterRelease(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -254,7 +267,8 @@ func TestSortKeyReadLockContentAfterRelease(t *testing.T) {
 	_, _ = createSortKeyTable(t, c)
 
 	data := []byte("some content for scotty")
-	lockedItem, err := c.AcquireLock("scotty",
+	lockedItem, err := c.AcquireLock(
+		"scotty",
 		dynamolock.WithData(data),
 		dynamolock.ReplaceData(),
 	)
@@ -268,7 +282,8 @@ func TestSortKeyReadLockContentAfterRelease(t *testing.T) {
 	}
 	lockedItem.Close()
 
-	c2, err := dynamolock.New(svc,
+	c2, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -294,7 +309,8 @@ func TestSortKeyReadLockContentAfterRelease(t *testing.T) {
 func TestSortKeyReadLockContentAfterDeleteOnRelease(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -311,7 +327,8 @@ func TestSortKeyReadLockContentAfterDeleteOnRelease(t *testing.T) {
 	_, _ = createSortKeyTable(t, c)
 
 	data := []byte("some content for uhura")
-	lockedItem, err := c.AcquireLock("uhura",
+	lockedItem, err := c.AcquireLock(
+		"uhura",
 		dynamolock.WithData(data),
 		dynamolock.ReplaceData(),
 		dynamolock.WithDeleteLockOnRelease(),
@@ -326,7 +343,8 @@ func TestSortKeyReadLockContentAfterDeleteOnRelease(t *testing.T) {
 	}
 	lockedItem.Close()
 
-	c2, err := dynamolock.New(svc,
+	c2, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -352,7 +370,8 @@ func TestSortKeyReadLockContentAfterDeleteOnRelease(t *testing.T) {
 func TestSortKeyInvalidLeaseHeartbeatRation(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	_, err := dynamolock.New(svc,
+	_, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(1*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -366,7 +385,8 @@ func TestSortKeyInvalidLeaseHeartbeatRation(t *testing.T) {
 func TestSortKeyFailIfLocked(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -395,7 +415,8 @@ func TestSortKeyFailIfLocked(t *testing.T) {
 func TestSortKeyClientWithAdditionalAttributes(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.DisableHeartbeat(),
@@ -470,7 +491,8 @@ func TestSortKeyClientWithAdditionalAttributes(t *testing.T) {
 func TestSortKeyDeleteLockOnRelease(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -517,7 +539,8 @@ func TestSortKeyCustomRefreshPeriod(t *testing.T) {
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
 	var buf bytes.Buffer
 	logger := log.New(&buf, "", 0)
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -548,7 +571,8 @@ func TestSortKeyCustomRefreshPeriod(t *testing.T) {
 func TestSortKeyCustomAdditionalTimeToWaitForLock(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.DisableHeartbeat(),
@@ -577,7 +601,8 @@ func TestSortKeyCustomAdditionalTimeToWaitForLock(t *testing.T) {
 	}()
 
 	t.Log("wait long enough to acquire lock again")
-	_, err = c.AcquireLock("custom-additional-time-to-wait",
+	_, err = c.AcquireLock(
+		"custom-additional-time-to-wait",
 		dynamolock.WithAdditionalTimeToWaitForLock(6*time.Second),
 	)
 	if err != nil {
@@ -588,7 +613,8 @@ func TestSortKeyCustomAdditionalTimeToWaitForLock(t *testing.T) {
 func TestSortKeyClientClose(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -655,7 +681,8 @@ func TestSortKeyClientClose(t *testing.T) {
 func TestSortKeyInvalidReleases(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -717,7 +744,8 @@ func TestSortKeyInvalidReleases(t *testing.T) {
 func TestSortKeyClientWithDataAfterRelease(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -759,7 +787,8 @@ func TestSortKeyHeartbeatLoss(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
 	heartbeatPeriod := 5 * time.Second
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		sortKeyTable,
 		dynamolock.WithLeaseDuration(1*time.Hour),
 		dynamolock.WithHeartbeatPeriod(heartbeatPeriod),
@@ -818,7 +847,8 @@ func TestSortKeyHeartbeatError(t *testing.T) {
 	logger := log.New(&buf, "", 0)
 
 	heartbeatPeriod := 2 * time.Second
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locksSkHBError",
 		dynamolock.WithLeaseDuration(1*time.Hour),
 		dynamolock.WithHeartbeatPeriod(heartbeatPeriod),
@@ -832,7 +862,8 @@ func TestSortKeyHeartbeatError(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, err = c.CreateTable("locksSkHBError",
+	_, err = c.CreateTable(
+		"locksSkHBError",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),

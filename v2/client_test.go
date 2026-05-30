@@ -154,7 +154,8 @@ func proxyConfig(t *testing.T) (aws.Config, func()) {
 func TestClientBasicFlow(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -167,7 +168,8 @@ func TestClientBasicFlow(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -176,7 +178,8 @@ func TestClientBasicFlow(t *testing.T) {
 	)
 
 	data := []byte("some content a")
-	lockedItem, err := c.AcquireLock("spock",
+	lockedItem, err := c.AcquireLock(
+		"spock",
 		dynamolock.WithData(data),
 		dynamolock.ReplaceData(),
 	)
@@ -200,7 +203,8 @@ func TestClientBasicFlow(t *testing.T) {
 	t.Log("done")
 
 	data2 := []byte("some content b")
-	lockedItem2, err := c.AcquireLock("spock",
+	lockedItem2, err := c.AcquireLock(
+		"spock",
 		dynamolock.WithData(data2),
 		dynamolock.ReplaceData(),
 	)
@@ -213,7 +217,8 @@ func TestClientBasicFlow(t *testing.T) {
 		t.Error("losing information inside lock storage, wanted:", string(data2), " got:", got)
 	}
 
-	c2, err := dynamolock.New(svc,
+	c2, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -223,7 +228,8 @@ func TestClientBasicFlow(t *testing.T) {
 		t.Fatal(err)
 	}
 	data3 := []byte("some content c")
-	_, err = c2.AcquireLock("spock",
+	_, err = c2.AcquireLock(
+		"spock",
 		dynamolock.WithData(data3),
 		dynamolock.ReplaceData(),
 	)
@@ -233,7 +239,8 @@ func TestClientBasicFlow(t *testing.T) {
 
 	_, _ = c.ReleaseLock(lockedItem, dynamolock.WithDeleteLock(true))
 
-	lockedItem3, err := c2.AcquireLock("spock",
+	lockedItem3, err := c2.AcquireLock(
+		"spock",
 		dynamolock.WithData(data3),
 		dynamolock.ReplaceData(),
 	)
@@ -251,7 +258,8 @@ func TestReadLockContent(t *testing.T) {
 
 	t.Run("standard load", func(t *testing.T) {
 		svc := dynamodb.NewFromConfig(defaultConfig(t))
-		c, err := dynamolock.New(svc,
+		c, err := dynamolock.New(
+			svc,
 			"locks",
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -264,7 +272,8 @@ func TestReadLockContent(t *testing.T) {
 		defer c.Close()
 
 		t.Log("ensuring table exists")
-		_, _ = c.CreateTable("locks",
+		_, _ = c.CreateTable(
+			"locks",
 			dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 				ReadCapacityUnits:  aws.Int64(5),
 				WriteCapacityUnits: aws.Int64(5),
@@ -273,7 +282,8 @@ func TestReadLockContent(t *testing.T) {
 		)
 
 		data := []byte("some content a")
-		lockedItem, err := c.AcquireLock("mccoy",
+		lockedItem, err := c.AcquireLock(
+			"mccoy",
 			dynamolock.WithData(data),
 			dynamolock.ReplaceData(),
 		)
@@ -286,7 +296,8 @@ func TestReadLockContent(t *testing.T) {
 			t.Error("losing information inside lock storage, wanted:", string(data), " got:", got)
 		}
 
-		c2, err := dynamolock.New(svc,
+		c2, err := dynamolock.New(
+			svc,
 			"locks",
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -310,7 +321,8 @@ func TestReadLockContent(t *testing.T) {
 	t.Run("cached load", func(t *testing.T) {
 		t.Parallel()
 		svc := dynamodb.NewFromConfig(defaultConfig(t))
-		c, err := dynamolock.New(svc,
+		c, err := dynamolock.New(
+			svc,
 			"locks",
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -323,7 +335,8 @@ func TestReadLockContent(t *testing.T) {
 		defer c.Close()
 
 		t.Log("ensuring table exists")
-		_, _ = c.CreateTable("locks",
+		_, _ = c.CreateTable(
+			"locks",
 			dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 				ReadCapacityUnits:  aws.Int64(5),
 				WriteCapacityUnits: aws.Int64(5),
@@ -332,7 +345,8 @@ func TestReadLockContent(t *testing.T) {
 		)
 
 		data := []byte("hello janice")
-		lockedItem, err := c.AcquireLock("janice",
+		lockedItem, err := c.AcquireLock(
+			"janice",
 			dynamolock.WithData(data),
 			dynamolock.ReplaceData(),
 		)
@@ -352,7 +366,8 @@ func TestReadLockContent(t *testing.T) {
 func TestReadLockContentAfterRelease(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -365,7 +380,8 @@ func TestReadLockContentAfterRelease(t *testing.T) {
 	defer c.Close()
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -374,7 +390,8 @@ func TestReadLockContentAfterRelease(t *testing.T) {
 	)
 
 	data := []byte("some content for scotty")
-	lockedItem, err := c.AcquireLock("scotty",
+	lockedItem, err := c.AcquireLock(
+		"scotty",
 		dynamolock.WithData(data),
 		dynamolock.ReplaceData(),
 	)
@@ -388,7 +405,8 @@ func TestReadLockContentAfterRelease(t *testing.T) {
 	}
 	lockedItem.Close()
 
-	c2, err := dynamolock.New(svc,
+	c2, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -415,7 +433,8 @@ func TestReadLockContentAfterDeleteOnRelease(t *testing.T) {
 	lockName := randStr()
 
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -428,7 +447,8 @@ func TestReadLockContentAfterDeleteOnRelease(t *testing.T) {
 	defer c.Close()
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -437,7 +457,8 @@ func TestReadLockContentAfterDeleteOnRelease(t *testing.T) {
 	)
 
 	data := []byte("some content for " + lockName)
-	lockedItem, err := c.AcquireLock(lockName,
+	lockedItem, err := c.AcquireLock(
+		lockName,
 		dynamolock.WithData(data),
 		dynamolock.ReplaceData(),
 		dynamolock.WithDeleteLockOnRelease(),
@@ -452,7 +473,8 @@ func TestReadLockContentAfterDeleteOnRelease(t *testing.T) {
 	}
 	lockedItem.Close()
 
-	c2, err := dynamolock.New(svc,
+	c2, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -477,7 +499,8 @@ func TestReadLockContentAfterDeleteOnRelease(t *testing.T) {
 func TestInvalidLeaseHeartbeatRation(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	_, err := dynamolock.New(svc,
+	_, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(1*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -490,7 +513,8 @@ func TestInvalidLeaseHeartbeatRation(t *testing.T) {
 func TestFailIfLocked(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -502,7 +526,8 @@ func TestFailIfLocked(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -524,7 +549,8 @@ func TestFailIfLocked(t *testing.T) {
 func TestClientWithAdditionalAttributes(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.DisableHeartbeat(),
@@ -536,7 +562,8 @@ func TestClientWithAdditionalAttributes(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -604,7 +631,8 @@ func TestClientWithAdditionalAttributes(t *testing.T) {
 func TestDeleteLockOnRelease(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -616,7 +644,8 @@ func TestDeleteLockOnRelease(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -656,7 +685,8 @@ func TestCustomRefreshPeriod(t *testing.T) {
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
 	var buf bytes.Buffer
 	logger := log.New(&buf, "", 0)
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -669,7 +699,8 @@ func TestCustomRefreshPeriod(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -692,7 +723,8 @@ func TestCustomRefreshPeriod(t *testing.T) {
 func TestCustomAdditionalTimeToWaitForLock(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.DisableHeartbeat(),
@@ -705,7 +737,8 @@ func TestCustomAdditionalTimeToWaitForLock(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -726,7 +759,8 @@ func TestCustomAdditionalTimeToWaitForLock(t *testing.T) {
 	}()
 
 	t.Log("wait long enough to acquire lock again")
-	_, err = c.AcquireLock("custom-additional-time-to-wait",
+	_, err = c.AcquireLock(
+		"custom-additional-time-to-wait",
 		dynamolock.WithAdditionalTimeToWaitForLock(6*time.Second),
 	)
 	if err != nil {
@@ -737,7 +771,8 @@ func TestCustomAdditionalTimeToWaitForLock(t *testing.T) {
 func TestClientClose(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -750,7 +785,8 @@ func TestClientClose(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -809,7 +845,8 @@ func TestClientClose(t *testing.T) {
 func TestInvalidReleases(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -822,7 +859,8 @@ func TestInvalidReleases(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -876,7 +914,8 @@ func TestInvalidReleases(t *testing.T) {
 func TestClientWithDataAfterRelease(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -889,7 +928,8 @@ func TestClientWithDataAfterRelease(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -923,7 +963,8 @@ func TestHeartbeatLoss(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
 	heartbeatPeriod := 5 * time.Second
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(1*time.Hour),
 		dynamolock.WithHeartbeatPeriod(heartbeatPeriod),
@@ -936,7 +977,8 @@ func TestHeartbeatLoss(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -987,7 +1029,8 @@ func TestHeartbeatError(t *testing.T) {
 	logger := log.New(&buf, "", 0)
 
 	heartbeatPeriod := 2 * time.Second
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locksHBError",
 		dynamolock.WithLeaseDuration(1*time.Hour),
 		dynamolock.WithHeartbeatPeriod(heartbeatPeriod),
@@ -1000,7 +1043,8 @@ func TestHeartbeatError(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, err = c.CreateTable("locksHBError",
+	_, err = c.CreateTable(
+		"locksHBError",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -1107,7 +1151,8 @@ func isLockNotGrantedError(err error) bool {
 
 func TestAcquireLockOnCloseClient(t *testing.T) {
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -1128,7 +1173,8 @@ func TestAcquireLockOnCloseClient(t *testing.T) {
 
 func TestAcquireLockOnCanceledContext(t *testing.T) {
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -1152,7 +1198,8 @@ func TestTableTags(t *testing.T) {
 	svc := &interceptedDynamoDBClient{
 		DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 	}
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locksWithTags",
 		dynamolock.WithOwnerName("TestTableTags#1"),
 		dynamolock.WithContextLogger(newBufferedContextLogger(t)),

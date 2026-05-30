@@ -31,7 +31,8 @@ import (
 func TestSessionMonitorRaceCondition(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithOwnerName("TestSessionMonitor#1"),
@@ -43,7 +44,8 @@ func TestSessionMonitorRaceCondition(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	c.CreateTable("locks",
+	c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -52,7 +54,8 @@ func TestSessionMonitorRaceCondition(t *testing.T) {
 	)
 
 	data := []byte("some content a")
-	_, err = c.AcquireLock("uhura",
+	_, err = c.AcquireLock(
+		"uhura",
 		dynamolock.WithData(data),
 		dynamolock.ReplaceData(),
 		dynamolock.WithSessionMonitor(500*time.Millisecond, func() {}),

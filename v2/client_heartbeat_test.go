@@ -39,7 +39,8 @@ func TestCancelationWithoutHearbeat(t *testing.T) {
 		}
 	}()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.DisableHeartbeat(),
 	)
@@ -52,7 +53,8 @@ func TestCancelationWithoutHearbeat(t *testing.T) {
 func TestHeartbeatHandover(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithOwnerName("TestHeartbeatHandover#1"),
@@ -64,7 +66,8 @@ func TestHeartbeatHandover(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -73,7 +76,8 @@ func TestHeartbeatHandover(t *testing.T) {
 	)
 
 	data := []byte("some content a")
-	lockedItem, err := c.AcquireLock("kirk",
+	lockedItem, err := c.AcquireLock(
+		"kirk",
 		dynamolock.WithData(data),
 		dynamolock.ReplaceData(),
 	)
@@ -102,7 +106,8 @@ func TestHeartbeatHandover(t *testing.T) {
 		}
 	})
 
-	c2, err := dynamolock.New(svc,
+	c2, err := dynamolock.New(
+		svc,
 		"locks",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
@@ -114,7 +119,8 @@ func TestHeartbeatHandover(t *testing.T) {
 	}
 
 	data2 := []byte("some content b")
-	_, err = c2.AcquireLock("kirk",
+	_, err = c2.AcquireLock(
+		"kirk",
 		dynamolock.WithData(data2),
 		dynamolock.ReplaceData(),
 	)
@@ -123,7 +129,8 @@ func TestHeartbeatHandover(t *testing.T) {
 	}
 
 	time.Sleep(6 * time.Second)
-	lockedItem2, err := c2.AcquireLock("kirk",
+	lockedItem2, err := c2.AcquireLock(
+		"kirk",
 		dynamolock.WithData(data2),
 		dynamolock.ReplaceData(),
 	)
@@ -143,7 +150,8 @@ func TestHeartbeatDataOps(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
 	newClient := func() (*dynamolock.Client, error) {
-		return dynamolock.New(svc,
+		return dynamolock.New(
+			svc,
 			"locks",
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithOwnerName("TestHeartbeatDataOps#1"),
@@ -157,7 +165,8 @@ func TestHeartbeatDataOps(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -268,7 +277,8 @@ func TestHeartbeatReadOnlyLock(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
 	newClient := func() (*dynamolock.Client, error) {
-		return dynamolock.New(svc,
+		return dynamolock.New(
+			svc,
 			"locks",
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithOwnerName("TestHeartbeatReadOnlyLock#1"),
@@ -282,7 +292,8 @@ func TestHeartbeatReadOnlyLock(t *testing.T) {
 	}
 
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("locks",
+	_, _ = c.CreateTable(
+		"locks",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),
@@ -371,7 +382,8 @@ func TestHeartbeatRetry(t *testing.T) {
 		svc := &interceptedDynamoDBClient{
 			DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 		}
-		c, err := dynamolock.New(svc,
+		c, err := dynamolock.New(
+			svc,
 			"noRetry",
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithOwnerName("TestHeartbeatRetry#noRetry"),
@@ -382,7 +394,8 @@ func TestHeartbeatRetry(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Log("ensuring table exists")
-		_, _ = c.CreateTable("noRetry",
+		_, _ = c.CreateTable(
+			"noRetry",
 			dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 				ReadCapacityUnits:  aws.Int64(5),
 				WriteCapacityUnits: aws.Int64(5),
@@ -414,7 +427,8 @@ func TestHeartbeatRetry(t *testing.T) {
 		svc := &interceptedDynamoDBClient{
 			DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 		}
-		c, err := dynamolock.New(svc,
+		c, err := dynamolock.New(
+			svc,
 			"retryOnce",
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithOwnerName("TestHeartbeatRetry#retryOnce"),
@@ -425,7 +439,8 @@ func TestHeartbeatRetry(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Log("ensuring table exists")
-		_, _ = c.CreateTable("retryOnce",
+		_, _ = c.CreateTable(
+			"retryOnce",
 			dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 				ReadCapacityUnits:  aws.Int64(5),
 				WriteCapacityUnits: aws.Int64(5),
@@ -457,7 +472,8 @@ func TestHeartbeatRetry(t *testing.T) {
 		svc := &interceptedDynamoDBClient{
 			DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 		}
-		c, err := dynamolock.New(svc,
+		c, err := dynamolock.New(
+			svc,
 			"retryMany",
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithOwnerName("TestHeartbeatRetry#retryMany"),
@@ -468,7 +484,8 @@ func TestHeartbeatRetry(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Log("ensuring table exists")
-		_, _ = c.CreateTable("retryMany",
+		_, _ = c.CreateTable(
+			"retryMany",
 			dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 				ReadCapacityUnits:  aws.Int64(5),
 				WriteCapacityUnits: aws.Int64(5),
@@ -502,7 +519,8 @@ func TestHeartbeatRetry(t *testing.T) {
 		svc := &interceptedDynamoDBClient{
 			DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 		}
-		c, err := dynamolock.New(svc,
+		c, err := dynamolock.New(
+			svc,
 			"badReadAfterFail",
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithOwnerName("TestHeartbeatRetry#badReadAfterFail"),
@@ -513,7 +531,8 @@ func TestHeartbeatRetry(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Log("ensuring table exists")
-		_, _ = c.CreateTable("badReadAfterFail",
+		_, _ = c.CreateTable(
+			"badReadAfterFail",
 			dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 				ReadCapacityUnits:  aws.Int64(5),
 				WriteCapacityUnits: aws.Int64(5),
@@ -549,7 +568,8 @@ func TestHeartbeatRetry(t *testing.T) {
 		svc := &interceptedDynamoDBClient{
 			DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 		}
-		c, err := dynamolock.New(svc,
+		c, err := dynamolock.New(
+			svc,
 			"canceledDuringRetry",
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithOwnerName("TestHeartbeatRetry#canceledDuringRetry"),
@@ -560,7 +580,8 @@ func TestHeartbeatRetry(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Log("ensuring table exists")
-		_, _ = c.CreateTable("canceledDuringRetry",
+		_, _ = c.CreateTable(
+			"canceledDuringRetry",
 			dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 				ReadCapacityUnits:  aws.Int64(5),
 				WriteCapacityUnits: aws.Int64(5),
@@ -599,7 +620,8 @@ func TestHeartbeatRetry(t *testing.T) {
 		svc := &interceptedDynamoDBClient{
 			DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 		}
-		c, err := dynamolock.New(svc,
+		c, err := dynamolock.New(
+			svc,
 			"lostDuringHeartbeatRetry",
 			dynamolock.WithLeaseDuration(3*time.Second),
 			dynamolock.WithOwnerName("TestHeartbeatRetry#lostDuringHeartbeatRetry"),
@@ -610,7 +632,8 @@ func TestHeartbeatRetry(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Log("ensuring table exists")
-		_, _ = c.CreateTable("lostDuringHeartbeatRetry",
+		_, _ = c.CreateTable(
+			"lostDuringHeartbeatRetry",
 			dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 				ReadCapacityUnits:  aws.Int64(5),
 				WriteCapacityUnits: aws.Int64(5),
@@ -651,7 +674,8 @@ func TestHeartbeatOwnerMatching(t *testing.T) {
 	svc := &interceptedDynamoDBClient{
 		DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 	}
-	c, err := dynamolock.New(svc,
+	c, err := dynamolock.New(
+		svc,
 		"noRetry",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithOwnerName("TestHeartbeatOwnerMatching"),
@@ -662,7 +686,8 @@ func TestHeartbeatOwnerMatching(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log("ensuring table exists")
-	_, _ = c.CreateTable("noRetry",
+	_, _ = c.CreateTable(
+		"noRetry",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(5),
 			WriteCapacityUnits: aws.Int64(5),

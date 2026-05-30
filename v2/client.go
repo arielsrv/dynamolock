@@ -420,7 +420,8 @@ func (c *Client) storeLock(ctx context.Context, getLockOptions *getLockOptions) 
 			newLockData,
 			item,
 			recordVersionNumber,
-			getLockOptions.sessionMonitor)
+			getLockOptions.sessionMonitor,
+		)
 		if upsertErr != nil && errors.As(upsertErr, new(*LockNotGrantedError)) {
 			return nil, nil
 		}
@@ -460,7 +461,8 @@ func (c *Client) storeLock(ctx context.Context, getLockOptions *getLockOptions) 
 			getLockOptions.deleteLockOnRelease,
 			existingLock, newLockData, item,
 			recordVersionNumber,
-			getLockOptions.sessionMonitor)
+			getLockOptions.sessionMonitor,
+		)
 		if upsertErr != nil && errors.As(upsertErr, new(*LockNotGrantedError)) {
 			return nil, nil
 		}
@@ -510,7 +512,8 @@ func (c *Client) upsertAndMonitorExpiredLock(
 		c.partitionKeyName, " partitionKeyName=", key)
 	return c.putLockItemAndStartSessionMonitor(
 		ctx, additionalAttributes, key, deleteLockOnRelease, newLockData,
-		recordVersionNumber, sessionMonitor, putItemRequest)
+		recordVersionNumber, sessionMonitor, putItemRequest,
+	)
 }
 
 func (c *Client) upsertAndMonitorNewOrReleasedLock(

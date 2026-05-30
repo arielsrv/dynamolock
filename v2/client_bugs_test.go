@@ -32,7 +32,8 @@ import (
 func TestIssue56(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	lockClient, err := dynamolock.New(svc,
+	lockClient, err := dynamolock.New(
+		svc,
 		"locksIssue56",
 		dynamolock.WithLeaseDuration(3*time.Second),
 		dynamolock.WithHeartbeatPeriod(100*time.Millisecond),
@@ -42,7 +43,8 @@ func TestIssue56(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _ = lockClient.CreateTable("locksIssue56",
+	_, _ = lockClient.CreateTable(
+		"locksIssue56",
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(1000),
 			WriteCapacityUnits: aws.Int64(1000),
