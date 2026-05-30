@@ -179,3 +179,4 @@ perform all of the following actions on the DynamoDB table containing the locks:
 * `UpdateItem`
 * `DeleteItem`
 * `CreateTable`
+
