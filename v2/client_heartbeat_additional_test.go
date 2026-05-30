@@ -15,9 +15,10 @@ import (
 
 // This test covers the early return path in SendHeartbeatWithContext when the
 // underlying UpdateItem returns a context error immediately. That exercises the
-// `if errors.Is(err, ctx.Err()) { return ctx.Err() }` branch that was not fully
+// `if [errors.Is](err, ctx.Err()) { return ctx.Err() }` branch that was not fully
 // covered.
 func TestHeartbeatImmediateContextCancel(t *testing.T) {
+	t.Parallel()
 	svc := &interceptedDynamoDBClient{
 		DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 	}
@@ -50,7 +51,7 @@ func TestHeartbeatImmediateContextCancel(t *testing.T) {
 
 	// Make UpdateItem immediately surface the context cancellation on the first
 	// heartbeat attempt (no retries involved).
-	svc.updateItemPost = func(uio *dynamodb.UpdateItemOutput, err error) (*dynamodb.UpdateItemOutput, error) {
+	svc.updateItemPost = func(_ *dynamodb.UpdateItemOutput, _ error) (*dynamodb.UpdateItemOutput, error) {
 		return nil, context.Canceled
 	}
 
@@ -101,7 +102,7 @@ func TestHeartbeatConditionalCheckFailedTransformsError(t *testing.T) {
 	}
 
 	// Force ConditionalCheckFailedException on UpdateItem.
-	svc.updateItemPost = func(uio *dynamodb.UpdateItemOutput, err error) (*dynamodb.UpdateItemOutput, error) {
+	svc.updateItemPost = func(_ *dynamodb.UpdateItemOutput, _ error) (*dynamodb.UpdateItemOutput, error) {
 		return nil, &types.ConditionalCheckFailedException{Message: aws.String("ccf")}
 	}
 

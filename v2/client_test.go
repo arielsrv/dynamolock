@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"math/rand"
 	"net"
 	"os"
@@ -42,8 +41,8 @@ import (
 )
 
 var (
-	dynamoEndpoint string
-	dynamoHostPort string
+	dynamoEndpoint string //nolint:gochecknoglobals // set in TestMain, used by defaultConfig
+	dynamoHostPort string //nolint:gochecknoglobals // set in TestMain, used by defaultConfig
 )
 
 func TestMain(m *testing.M) {
@@ -243,6 +242,7 @@ func TestReadLockContent(t *testing.T) {
 	t.Parallel()
 
 	t.Run("standard load", func(t *testing.T) {
+		t.Parallel()
 		svc := dynamodb.NewFromConfig(defaultConfig(t))
 		c, err := dynamolock.New(
 			svc,
@@ -558,6 +558,7 @@ func TestClientWithAdditionalAttributes(t *testing.T) {
 	)
 
 	t.Run("good attributes", func(t *testing.T) {
+		t.Parallel()
 		lockedItem, acquireErr := c.AcquireLock(
 			"good attributes",
 			dynamolock.WithAdditionalAttributes(map[string]types.AttributeValue{
@@ -574,6 +575,7 @@ func TestClientWithAdditionalAttributes(t *testing.T) {
 		lockedItem.Close()
 	})
 	t.Run("bad attributes", func(t *testing.T) {
+		t.Parallel()
 		_, acquireErr := c.AcquireLock(
 			"bad attributes",
 			dynamolock.WithAdditionalAttributes(map[string]types.AttributeValue{
@@ -670,7 +672,7 @@ func TestCustomRefreshPeriod(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
 	var buf bytes.Buffer
-	logger := log.New(&buf, "", 0)
+	logger := &writerLogger{w: &buf}
 	c, err := dynamolock.New(
 		svc,
 		"locks",
@@ -855,6 +857,7 @@ func TestInvalidReleases(t *testing.T) {
 	)
 
 	t.Run("release nil lock", func(t *testing.T) {
+		t.Parallel()
 		var l *dynamolock.Lock
 		if _, releaseErr := c.ReleaseLock(l); releaseErr == nil {
 			t.Fatal("nil locks should trigger error on release:", releaseErr)
@@ -864,6 +867,7 @@ func TestInvalidReleases(t *testing.T) {
 	})
 
 	t.Run("release empty lock", func(t *testing.T) {
+		t.Parallel()
 		emptyLock := &dynamolock.Lock{}
 		if released, releaseErr := c.ReleaseLock(emptyLock); !errors.Is(releaseErr, dynamolock.ErrOwnerMismatched) {
 			t.Fatal("empty locks should return error:", releaseErr)
@@ -873,6 +877,7 @@ func TestInvalidReleases(t *testing.T) {
 	})
 
 	t.Run("duplicated lock close", func(t *testing.T) {
+		t.Parallel()
 		l, acquireErr := c.AcquireLock("duplicatedLockRelease")
 		if acquireErr != nil {
 			t.Fatal(acquireErr)
@@ -1012,7 +1017,7 @@ func TestHeartbeatError(t *testing.T) {
 	defer func() {
 		t.Log(buf.String())
 	}()
-	logger := log.New(&buf, "", 0)
+	logger := &writerLogger{w: &buf}
 
 	heartbeatPeriod := 2 * time.Second
 	c, err := dynamolock.New(
@@ -1087,9 +1092,9 @@ type fakeDynamoDB struct {
 }
 
 func (f *fakeDynamoDB) GetItem(
-	ctx context.Context,
-	params *dynamodb.GetItemInput,
-	optFns ...func(*dynamodb.Options),
+	_ context.Context,
+	_ *dynamodb.GetItemInput,
+	_ ...func(*dynamodb.Options),
 ) (*dynamodb.GetItemOutput, error) {
 	return nil, errors.New("service is offline")
 }
@@ -1136,6 +1141,7 @@ func isLockNotGrantedError(err error) bool {
 }
 
 func TestAcquireLockOnCloseClient(t *testing.T) {
+	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
 	c, err := dynamolock.New(
 		svc,
@@ -1158,6 +1164,7 @@ func TestAcquireLockOnCloseClient(t *testing.T) {
 }
 
 func TestAcquireLockOnCanceledContext(t *testing.T) {
+	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
 	c, err := dynamolock.New(
 		svc,
@@ -1181,6 +1188,7 @@ func TestAcquireLockOnCanceledContext(t *testing.T) {
 }
 
 func TestTableTags(t *testing.T) {
+	t.Parallel()
 	svc := &interceptedDynamoDBClient{
 		DynamoDBClient: dynamodb.NewFromConfig(defaultConfig(t)),
 	}
@@ -1212,7 +1220,9 @@ func TestTableTags(t *testing.T) {
 	}
 }
 
-var chars = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var chars = []byte(
+	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+)
 
 func randStr() string {
 	const length = 32

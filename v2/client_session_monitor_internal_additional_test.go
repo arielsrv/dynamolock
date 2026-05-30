@@ -1,9 +1,8 @@
+//nolint:testpackage // needs access to unexported types contextLoggerAdapter and noopLogger
 package dynamolock
 
 import (
 	"context"
-	"io"
-	"log"
 	"testing"
 	"time"
 )
@@ -16,7 +15,7 @@ func TestLockSessionMonitorChecker_ExpiredEarlyExit(t *testing.T) {
 
 	c := &Client{
 		logger: &contextLoggerAdapter{
-			logger: log.New(io.Discard, "", 0),
+			logger: noopLogger{},
 		},
 	}
 
@@ -37,7 +36,7 @@ func TestLockSessionMonitorChecker_ContextCanceled(t *testing.T) {
 
 	c := &Client{
 		logger: &contextLoggerAdapter{
-			logger: log.New(io.Discard, "", 0),
+			logger: noopLogger{},
 		},
 	}
 

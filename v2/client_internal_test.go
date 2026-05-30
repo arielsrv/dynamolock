@@ -35,14 +35,15 @@ are able to be acquired while the client is closing, and to ensure that we don't
 any locks in the internal lock map after a client is closed.
 */
 func TestCloseRace(t *testing.T) {
+	t.Parallel()
 	mockSvc := &mockDynamoDBClient{
-		GetItemFunc: func(ctx context.Context, params *dynamodb.GetItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.GetItemOutput, error) {
+		GetItemFunc: func(_ context.Context, _ *dynamodb.GetItemInput, _ ...func(*dynamodb.Options)) (*dynamodb.GetItemOutput, error) {
 			return &dynamodb.GetItemOutput{}, nil
 		},
-		PutItemFunc: func(ctx context.Context, params *dynamodb.PutItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.PutItemOutput, error) {
+		PutItemFunc: func(_ context.Context, _ *dynamodb.PutItemInput, _ ...func(*dynamodb.Options)) (*dynamodb.PutItemOutput, error) {
 			return &dynamodb.PutItemOutput{}, nil
 		},
-		UpdateItemFunc: func(ctx context.Context, params *dynamodb.UpdateItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.UpdateItemOutput, error) {
+		UpdateItemFunc: func(_ context.Context, _ *dynamodb.UpdateItemInput, _ ...func(*dynamodb.Options)) (*dynamodb.UpdateItemOutput, error) {
 			return &dynamodb.UpdateItemOutput{}, nil
 		},
 	}
@@ -88,6 +89,7 @@ func TestCloseRace(t *testing.T) {
 }
 
 func TestBadCreateLockItem(t *testing.T) {
+	t.Parallel()
 	c := &Client{}
 	_, err := c.createLockItem(getLockOptions{}, map[string]types.AttributeValue{
 		attrLeaseDuration: stringAttrValue("bad duration"),

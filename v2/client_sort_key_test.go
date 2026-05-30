@@ -21,7 +21,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 	"testing"
 	"time"
@@ -151,6 +150,7 @@ func TestSortKeyReadLockContent(t *testing.T) {
 	t.Parallel()
 
 	t.Run("standard load", func(t *testing.T) {
+		t.Parallel()
 		svc := dynamodb.NewFromConfig(defaultConfig(t))
 		c, err := dynamolock.New(
 			svc,
@@ -432,6 +432,7 @@ func TestSortKeyClientWithAdditionalAttributes(t *testing.T) {
 	_, _ = createSortKeyTable(t, c)
 
 	t.Run("good attributes", func(t *testing.T) {
+		t.Parallel()
 		lockedItem, acquireErr := c.AcquireLock(
 			"good attributes",
 			dynamolock.WithAdditionalAttributes(map[string]types.AttributeValue{
@@ -448,6 +449,7 @@ func TestSortKeyClientWithAdditionalAttributes(t *testing.T) {
 		lockedItem.Close()
 	})
 	t.Run("bad attributes", func(t *testing.T) {
+		t.Parallel()
 		_, acquireErr := c.AcquireLock(
 			"bad attributes",
 			dynamolock.WithAdditionalAttributes(map[string]types.AttributeValue{
@@ -538,7 +540,7 @@ func TestSortKeyCustomRefreshPeriod(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
 	var buf bytes.Buffer
-	logger := log.New(&buf, "", 0)
+	logger := &writerLogger{w: &buf}
 	c, err := dynamolock.New(
 		svc,
 		sortKeyTable,
@@ -699,6 +701,7 @@ func TestSortKeyInvalidReleases(t *testing.T) {
 	_, _ = createSortKeyTable(t, c)
 
 	t.Run("release nil lock", func(t *testing.T) {
+		t.Parallel()
 		var l *dynamolock.Lock
 		if _, releaseErr := c.ReleaseLock(l); releaseErr == nil {
 			t.Fatal("nil locks should trigger error on release:", releaseErr)
@@ -708,6 +711,7 @@ func TestSortKeyInvalidReleases(t *testing.T) {
 	})
 
 	t.Run("release empty lock", func(t *testing.T) {
+		t.Parallel()
 		emptyLock := &dynamolock.Lock{}
 		if released, releaseErr := c.ReleaseLock(emptyLock); !errors.Is(releaseErr, dynamolock.ErrOwnerMismatched) {
 			t.Fatal("empty locks should return error:", releaseErr)
@@ -717,6 +721,7 @@ func TestSortKeyInvalidReleases(t *testing.T) {
 	})
 
 	t.Run("duplicated lock close", func(t *testing.T) {
+		t.Parallel()
 		l, acquireErr := c.AcquireLock("duplicatedLockRelease")
 		if acquireErr != nil {
 			t.Fatal(acquireErr)
@@ -844,7 +849,7 @@ func TestSortKeyHeartbeatError(t *testing.T) {
 	defer func() {
 		t.Log(buf.String())
 	}()
-	logger := log.New(&buf, "", 0)
+	logger := &writerLogger{w: &buf}
 
 	heartbeatPeriod := 2 * time.Second
 	c, err := dynamolock.New(

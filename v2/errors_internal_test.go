@@ -28,6 +28,7 @@ import (
 func TestLockNotGrantedError(t *testing.T) {
 	t.Parallel()
 	t.Run("simply not granted", func(t *testing.T) {
+		t.Parallel()
 		var errNotGranted *LockNotGrantedError
 		notGranted := &LockNotGrantedError{msg: "not granted"}
 		if !errors.As(notGranted, &errNotGranted) {

@@ -146,7 +146,7 @@ func TestHeartbeatHandover(t *testing.T) {
 	wg.Wait()
 }
 
-func TestHeartbeatDataOps(t *testing.T) {
+func TestHeartbeatDataOps(t *testing.T) { //nolint:gocognit // inherently complex control flow
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
 	newClient := func() (*dynamolock.Client, error) {
@@ -175,6 +175,7 @@ func TestHeartbeatDataOps(t *testing.T) {
 	)
 
 	t.Run("delete data on heartbeat", func(t *testing.T) {
+		t.Parallel()
 		const lockName = "delete-data-on-heartbeat"
 		data := []byte("some content a")
 		lockedItem, acquireErr := c.AcquireLock(lockName, dynamolock.WithData(data), dynamolock.ReplaceData())
@@ -207,6 +208,7 @@ func TestHeartbeatDataOps(t *testing.T) {
 	})
 
 	t.Run("replace data on heartbeat", func(t *testing.T) {
+		t.Parallel()
 		const lockName = "replace-data-on-heartbeat"
 		data := []byte("some content a")
 		lockedItem, acquireErr := c.AcquireLock(lockName, dynamolock.WithData(data), dynamolock.ReplaceData())
@@ -375,7 +377,7 @@ func (m *interceptedDynamoDBClient) UpdateItem(
 	return m.updateItemPost(out, err)
 }
 
-func TestHeartbeatRetry(t *testing.T) {
+func TestHeartbeatRetry(t *testing.T) { //nolint:gocognit // inherently complex control flow
 	t.Parallel()
 	t.Run("noRetry", func(t *testing.T) {
 		t.Parallel()
@@ -554,7 +556,7 @@ func TestHeartbeatRetry(t *testing.T) {
 			return uio, err
 		}
 		errExpected := errors.New("bad GetItemCall")
-		svc.getItemPost = func(gio *dynamodb.GetItemOutput, err error) (*dynamodb.GetItemOutput, error) {
+		svc.getItemPost = func(_ *dynamodb.GetItemOutput, _ error) (*dynamodb.GetItemOutput, error) {
 			return nil, errExpected
 		}
 

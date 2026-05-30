@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"maps"
 	"runtime"
 	"sync"
@@ -48,19 +47,34 @@ const (
 )
 
 var (
-	dataAttr          = expression.Name(attrData)
-	ownerNameAttr     = expression.Name(attrOwnerName)
-	leaseDurationAttr = expression.Name(attrLeaseDuration)
-	rvnAttr           = expression.Name(attrRecordVersionNumber)
-	isReleasedAttr    = expression.Name(attrIsReleased)
+	dataAttr = expression.Name(
+		attrData,
+	)
+	ownerNameAttr = expression.Name(
+		attrOwnerName,
+	)
+	leaseDurationAttr = expression.Name(
+		attrLeaseDuration,
+	)
+	rvnAttr = expression.Name(
+		attrRecordVersionNumber,
+	)
+	isReleasedAttr = expression.Name(
+		attrIsReleased,
+	)
 )
 
-var isReleasedAttrVal = expression.Value("1")
+var isReleasedAttrVal = expression.Value("1") //nolint:gochecknoglobals // pre-built expression value; initialized once
 
 // Logger defines the minimum desired logger interface for the lock client.
 type Logger interface {
 	Println(v ...any)
 }
+
+// noopLogger is a Logger that discards all output.
+type noopLogger struct{}
+
+func (noopLogger) Println(...any) {}
 
 // ContextLogger defines a logger interface that can be used to pass extra information to the implementation.
 // For example, if you use zap, you may have extra fields you want to add to the log line. You
@@ -118,7 +132,7 @@ func New(dynamoDB DynamoDBClient, tableName string, opts ...ClientOption) (*Clie
 		heartbeatPeriod:  defaultHeartbeatPeriod,
 		ownerName:        randString(),
 		logger: &contextLoggerAdapter{
-			logger: log.New(io.Discard, "", 0),
+			logger: noopLogger{},
 		},
 		stopHeartbeat: func() {},
 	}
@@ -369,7 +383,10 @@ func (c *Client) acquireLock(ctx context.Context, opt *acquireLockOptions) (*Loc
 	}
 }
 
-func (c *Client) storeLock(ctx context.Context, getLockOptions *getLockOptions) (*Lock, error) {
+func (c *Client) storeLock(
+	ctx context.Context,
+	getLockOptions *getLockOptions,
+) (*Lock, error) {
 	c.logger.Println(ctx, "Call GetItem to see if the lock for ",
 		c.partitionKeyName, " =", getLockOptions.partitionKeyName, " exists in the table")
 	existingLock, err := c.getLockFromDynamoDB(ctx, *getLockOptions)
@@ -423,7 +440,7 @@ func (c *Client) storeLock(ctx context.Context, getLockOptions *getLockOptions) 
 			getLockOptions.sessionMonitor,
 		)
 		if upsertErr != nil && errors.As(upsertErr, new(*LockNotGrantedError)) {
-			return nil, nil
+			return nil, nil //nolint:nilnil // sentinel: caller retries on nil lock without error
 		}
 		return l, upsertErr
 	}
@@ -464,7 +481,7 @@ func (c *Client) storeLock(ctx context.Context, getLockOptions *getLockOptions) 
 			getLockOptions.sessionMonitor,
 		)
 		if upsertErr != nil && errors.As(upsertErr, new(*LockNotGrantedError)) {
-			return nil, nil
+			return nil, nil //nolint:nilnil // sentinel: caller retries on nil lock without error
 		}
 		return l, upsertErr
 	case getLockOptions.lockTryingToBeAcquired.recordVersionNumber != existingLock.recordVersionNumber:
@@ -481,7 +498,7 @@ func (c *Client) storeLock(ctx context.Context, getLockOptions *getLockOptions) 
 			cause: &TimeoutError{Age: t},
 		}
 	}
-	return nil, nil
+	return nil, nil //nolint:nilnil // sentinel: caller retries on nil lock without error
 }
 
 func (c *Client) upsertAndMonitorExpiredLock(
@@ -596,7 +613,7 @@ func (c *Client) getLockFromDynamoDB(ctx context.Context, opt getLockOptions) (*
 
 	item := res.Item
 	if item == nil {
-		return nil, nil
+		return nil, nil //nolint:nilnil // sentinel: caller retries on nil lock without error
 	}
 
 	return c.createLockItem(opt, item)
@@ -670,10 +687,14 @@ func (c *Client) generateRecordVersionNumber() string {
 	return fmt.Sprint(time.Now().UnixNano(), ":", randString())
 }
 
-var base32Encoder = base32.StdEncoding.WithPadding(base32.NoPadding)
+var base32Encoder = base32.StdEncoding.WithPadding(
+	base32.NoPadding,
+)
+
+const randStringSize = 32
 
 func randString() string {
-	randomBytes := make([]byte, 32)
+	randomBytes := make([]byte, randStringSize)
 	for {
 		if _, err := io.ReadFull(rand.Reader, randomBytes); err == nil {
 			break
@@ -1174,7 +1195,7 @@ type DynamoDBClient interface {
 
 // Sugar functions
 
-// GetWithContext loads the given lock, but does not acquire the lock. It
+// Get loads the given lock, but does not acquire the lock. It
 // returns the metadata currently associated with the given lock. If the client
 // pointer is the one who acquired the lock, it will return the lock, and
 // operations such as releaseLock will work. However, if the client is not the

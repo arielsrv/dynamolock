@@ -26,6 +26,7 @@ func (l *Lock) RVN() string {
 }
 
 func TestExpiredNilLock(t *testing.T) {
+	t.Parallel()
 	defer func() {
 		if r := recover(); r != nil {
 			t.Fatal("unexpected panic:", r)

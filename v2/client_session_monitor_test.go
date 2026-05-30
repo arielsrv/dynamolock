@@ -21,7 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+	"io"
 	"sync"
 	"testing"
 	"time"
@@ -291,9 +291,8 @@ func newBufferedLogger(tb testing.TB) *bufferedLogger {
 }
 
 type bufferedLogger struct {
-	mu     sync.Mutex
-	buf    bytes.Buffer
-	logger *log.Logger
+	mu  sync.Mutex
+	buf bytes.Buffer
 }
 
 func (bl *bufferedLogger) String() string {
@@ -305,10 +304,7 @@ func (bl *bufferedLogger) String() string {
 func (bl *bufferedLogger) Println(a ...any) {
 	bl.mu.Lock()
 	defer bl.mu.Unlock()
-	if bl.logger == nil {
-		bl.logger = log.New(&bl.buf, "", 0)
-	}
-	bl.logger.Println(a...)
+	fmt.Fprintln(&bl.buf, a...)
 }
 
 func newBufferedContextLogger(tb testing.TB) *bufferedContextLogger {
@@ -321,9 +317,8 @@ func newBufferedContextLogger(tb testing.TB) *bufferedContextLogger {
 }
 
 type bufferedContextLogger struct {
-	mu     sync.Mutex
-	buf    bytes.Buffer
-	logger *log.Logger
+	mu  sync.Mutex
+	buf bytes.Buffer
 }
 
 func (bl *bufferedContextLogger) String() string {
@@ -335,8 +330,13 @@ func (bl *bufferedContextLogger) String() string {
 func (bl *bufferedContextLogger) Println(_ context.Context, a ...any) {
 	bl.mu.Lock()
 	defer bl.mu.Unlock()
-	if bl.logger == nil {
-		bl.logger = log.New(&bl.buf, "", 0)
-	}
-	bl.logger.Println(a...)
+	fmt.Fprintln(&bl.buf, a...)
+}
+
+type writerLogger struct {
+	w io.Writer
+}
+
+func (l *writerLogger) Println(v ...any) {
+	fmt.Fprintln(l.w, v...)
 }

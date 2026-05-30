@@ -19,6 +19,11 @@ import (
 	"cirello.io/dynamolock/v2"
 )
 
+const (
+	leaseDurationSec   = 3
+	tableCapacityUnits = 5
+)
+
 func main() {
 	log.SetPrefix("lock-example: ")
 	log.SetFlags(0)
@@ -84,7 +89,7 @@ func dialDynamoDB(ctx context.Context, tableName string) (*dynamolock.Client, er
 			}
 		}),
 		tableName,
-		dynamolock.WithLeaseDuration(3*time.Second),
+		dynamolock.WithLeaseDuration(leaseDurationSec*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
 		dynamolock.WithPartitionKeyName("key"),
 	)
@@ -98,8 +103,8 @@ func createTable(ctx context.Context, client *dynamolock.Client, tableName strin
 	_, err := client.CreateTableWithContext(
 		ctx, tableName,
 		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(5),
-			WriteCapacityUnits: aws.Int64(5),
+			ReadCapacityUnits:  aws.Int64(tableCapacityUnits),
+			WriteCapacityUnits: aws.Int64(tableCapacityUnits),
 		}),
 		dynamolock.WithCustomPartitionKeyName("key"),
 	)

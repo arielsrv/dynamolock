@@ -19,27 +19,35 @@ package sync
 import "sync"
 
 type Map[K comparable, V any] struct {
-	syncmap sync.Map
+	syncMap sync.Map
 }
 
 func (m *Map[K, V]) Store(key K, value V) {
-	m.syncmap.Store(key, value)
+	m.syncMap.Store(key, value)
 }
 
 func (m *Map[K, V]) Range(f func(key K, value V) bool) {
-	m.syncmap.Range(func(key, value any) bool {
-		return f(key.(K), value.(V))
+	m.syncMap.Range(func(key, value any) bool {
+		k, ok1 := key.(K)
+		v, ok2 := value.(V)
+		if ok1 && ok2 {
+			return f(k, v)
+		}
+		return false
 	})
 }
 
 func (m *Map[K, V]) Delete(key K) {
-	m.syncmap.Delete(key)
+	m.syncMap.Delete(key)
 }
 
-func (m *Map[K, V]) Load(key K) (value V, ok bool) {
-	v, ok := m.syncmap.Load(key)
+func (m *Map[K, V]) Load(key K) (V, bool) {
+	v, ok := m.syncMap.Load(key)
+	var zero V
 	if v != nil {
-		value = v.(V)
+		if val, ok2 := v.(V); ok2 {
+			return val, ok
+		}
 	}
-	return value, ok
+	return zero, ok
 }

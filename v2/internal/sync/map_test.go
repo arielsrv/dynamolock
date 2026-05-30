@@ -14,14 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package sync
+package sync_test
 
 import (
 	"testing"
+
+	internalsync "cirello.io/dynamolock/v2/internal/sync"
 )
 
 func TestMap(t *testing.T) {
-	var m Map[string, string]
+	t.Parallel()
+	var m internalsync.Map[string, string]
 	const (
 		key   = "key"
 		value = "value"
