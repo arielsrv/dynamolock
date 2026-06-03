@@ -1,5 +1,5 @@
 /*
-Copyright 2019 github.com/ucirello
+Copyright 2019 github.com/arielsrv
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	"cirello.io/dynamolock"
+	"github.com/arielsrv/dynamolock"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )

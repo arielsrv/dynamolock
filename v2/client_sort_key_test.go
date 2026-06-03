@@ -1,5 +1,5 @@
 /*
-Copyright 2021 U. Cirello (cirello.io and github.com/cirello-io)
+Copyright 2021 github.com/arielsrv
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 
-	"cirello.io/dynamolock/v2"
+	"github.com/arielsrv/dynamolock/v2"
 )
 
 const (
@@ -462,7 +462,7 @@ func TestSortKeyClientWithAdditionalAttributes(t *testing.T) {
 	})
 	t.Run("recover attributes after release", func(t *testing.T) {
 		t.Parallel()
-		// Cover cirello-io/dynamolock#6
+		// Cover arielsrv/dynamolock#6
 		lockedItem, acquireErr := c.AcquireLock(
 			"recover attributes after release",
 			dynamolock.WithAdditionalAttributes(map[string]types.AttributeValue{

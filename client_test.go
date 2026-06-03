@@ -1,5 +1,5 @@
 /*
-Copyright 2015 github.com/ucirello
+Copyright 2015 github.com/arielsrv
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"cirello.io/dynamolock"
+	"github.com/arielsrv/dynamolock"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/request"
@@ -489,7 +489,7 @@ func TestClientWithAdditionalAttributes(t *testing.T) {
 		}
 	})
 	t.Run("recover attributes after release", func(t *testing.T) {
-		// Cover cirello-io/dynamolock#6
+		// Cover arielsrv/dynamolock#6
 		lockedItem, err := c.AcquireLock(
 			"recover attributes after release",
 			dynamolock.WithAdditionalAttributes(map[string]*dynamodb.AttributeValue{

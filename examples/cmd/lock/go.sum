@@ -1,5 +1,5 @@
-cirello.io/dynamolock v1.3.1 h1:6yFrQA0lzs8r6rqv8Z8Gmqc+Vu9HJ6g6K7K6iYjwDh8=
-cirello.io/dynamolock v1.3.1/go.mod h1:fN+6SmAi3x5I/Ou5hRi4lLBSk+y4gNA/Le7okMEURM8=
+github.com/arielsrv/dynamolock v1.3.1 h1:6yFrQA0lzs8r6rqv8Z8Gmqc+Vu9HJ6g6K7K6iYjwDh8=
+github.com/arielsrv/dynamolock v1.3.1/go.mod h1:fN+6SmAi3x5I/Ou5hRi4lLBSk+y4gNA/Le7okMEURM8=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/aws/aws-sdk-go v1.23.7/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
 github.com/aws/aws-sdk-go v1.23.13 h1:l/NG+mgQFRGG3dsFzEj0jw9JIs/zYdtU6MXhY1WIDmM=

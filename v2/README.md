@@ -1,8 +1,8 @@
 # DynamoDB Lock Client for Go — v2
 
-[![Build status](https://github.com/cirello-io/dynamolock/actions/workflows/v2.yml/badge.svg)](https://github.com/cirello-io/dynamolock/actions/workflows/v2.yml)
-[![GoDoc](https://pkg.go.dev/badge/cirello.io/dynamolock/v2)](https://pkg.go.dev/cirello.io/dynamolock/v2)
-[![Go Report Card](https://goreportcard.com/badge/cirello.io/dynamolock/v2)](https://goreportcard.com/report/cirello.io/dynamolock/v2)
+[![Build status](https://github.com/arielsrv/dynamolock/actions/workflows/v2.yml/badge.svg)](https://github.com/arielsrv/dynamolock/actions/workflows/v2.yml)
+[![GoDoc](https://pkg.go.dev/badge/github.com/arielsrv/dynamolock/v2)](https://pkg.go.dev/github.com/arielsrv/dynamolock/v2)
+[![Go Report Card](https://goreportcard.com/badge/github.com/arielsrv/dynamolock/v2)](https://goreportcard.com/report/github.com/arielsrv/dynamolock/v2)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 `dynamolock/v2` is a general-purpose **distributed locking** library for Go,
@@ -61,7 +61,7 @@ Typical use cases:
 ## Installation
 
 ```sh
-go get cirello.io/dynamolock/v2
+go get github.com/arielsrv/dynamolock/v2
 ```
 
 Requires Go modules. The minimum Go version is the one declared in
@@ -86,7 +86,7 @@ import (
 	"log"
 	"time"
 
-	"cirello.io/dynamolock/v2"
+	"github.com/arielsrv/dynamolock/v2"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -135,7 +135,7 @@ import (
 	"log"
 	"time"
 
-	"cirello.io/dynamolock/v2"
+	"github.com/arielsrv/dynamolock/v2"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
@@ -314,7 +314,7 @@ to just the item-level actions (`GetItem`, `PutItem`, `UpdateItem`,
 - All public methods have explicit `context.Context` variants, and the
   context-aware forms are the preferred API.
 - The v1 module is retired; new code should depend on
-  `cirello.io/dynamolock/v2`.
+  `github.com/arielsrv/dynamolock/v2`.
 
 ---
 
@@ -337,7 +337,7 @@ make stop-dynamodb   # stop DynamoDB Local
 ## Contributing
 
 Issues and pull requests are welcome at
-<https://github.com/cirello-io/dynamolock>. Please run the linters and tests
+<https://github.com/arielsrv/dynamolock>. Please run the linters and tests
 before opening a PR:
 
 ```sh
@@ -346,7 +346,7 @@ make lint    # golangci-lint
 ```
 
 This package is covered by the SLA published at
-<https://github.com/cirello-io/public/blob/master/SLA.md>.
+<https://github.com/arielsrv/public/blob/master/SLA.md>.
 
 ---
 

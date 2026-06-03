@@ -10,7 +10,7 @@ import (
 	"os/signal"
 	"time"
 
-	"cirello.io/dynamolock"
+	"github.com/arielsrv/dynamolock"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"

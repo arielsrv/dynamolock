@@ -16,7 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/urfave/cli/v2"
 
-	"cirello.io/dynamolock/v2"
+	"github.com/arielsrv/dynamolock/v2"
 )
 
 const (

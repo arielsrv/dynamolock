@@ -1,5 +1,5 @@
 /*
-Copyright 2019 github.com/ucirello
+Copyright 2019 github.com/arielsrv
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package dynamolock_test
 import (
 	"testing"
 
-	"cirello.io/dynamolock"
+	"github.com/arielsrv/dynamolock"
 )
 
 func TestNilLock(t *testing.T) {

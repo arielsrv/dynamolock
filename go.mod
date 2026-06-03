@@ -1,4 +1,4 @@
-module cirello.io/dynamolock
+module github.com/arielsrv/dynamolock
 
 go 1.25.0
 

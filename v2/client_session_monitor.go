@@ -1,5 +1,5 @@
 /*
-Copyright 2021 U. Cirello (cirello.io and github.com/cirello-io)
+Copyright 2021 github.com/arielsrv
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

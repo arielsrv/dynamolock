@@ -1,5 +1,5 @@
 /*
-Copyright 2023 U. Cirello (cirello.io and github.com/cirello-io)
+Copyright 2023 github.com/arielsrv
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package sync_test
 import (
 	"testing"
 
-	internalsync "cirello.io/dynamolock/v2/internal/sync"
+	internalsync "github.com/arielsrv/dynamolock/v2/internal/sync"
 )
 
 func TestMap(t *testing.T) {
