@@ -3,12 +3,12 @@ module github.com/arielsrv/dynamolock/v2
 go 1.26.4
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.41.11
-	github.com/aws/aws-sdk-go-v2/config v1.32.22
-	github.com/aws/aws-sdk-go-v2/credentials v1.19.21
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.8.44
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.57.8
-	github.com/testcontainers/testcontainers-go v0.42.0
+	github.com/aws/aws-sdk-go-v2 v1.42.0
+	github.com/aws/aws-sdk-go-v2/config v1.32.25
+	github.com/aws/aws-sdk-go-v2/credentials v1.19.24
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.8.48
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.59.0
+	github.com/testcontainers/testcontainers-go v0.43.0
 	github.com/urfave/cli/v2 v2.27.7
 )
 
@@ -48,20 +48,20 @@ require (
 	github.com/apex/log v1.9.0 // indirect
 	github.com/ashanbrown/forbidigo/v2 v2.3.1 // indirect
 	github.com/ashanbrown/makezero/v2 v2.2.1 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.20.44 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.27 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.27 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.27 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.28 // indirect
-	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.32.20 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.11 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.12.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.27 // indirect
-	github.com/aws/aws-sdk-go-v2/service/signin v1.1.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.31.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.36.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.43.1 // indirect
-	github.com/aws/smithy-go v1.27.0 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.20.48 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.29 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.29 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.29 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.30 // indirect
+	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.34.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.12 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.12.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.29 // indirect
+	github.com/aws/aws-sdk-go-v2/service/signin v1.2.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.31.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.36.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.43.3 // indirect
+	github.com/aws/smithy-go v1.27.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitfield/gotestdox v0.2.2 // indirect
 	github.com/bkielbasa/cyclop v1.2.3 // indirect
@@ -208,7 +208,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/go-archive v0.2.0 // indirect
-	github.com/moby/moby/api v1.54.1 // indirect
+	github.com/moby/moby/api v1.54.2 // indirect
 	github.com/moby/moby/client v0.4.0 // indirect
 	github.com/moby/patternmatcher v0.6.1 // indirect
 	github.com/moby/sys/sequential v0.6.0 // indirect
@@ -252,7 +252,7 @@ require (
 	github.com/sashamelentyev/interfacebloat v1.1.0 // indirect
 	github.com/sashamelentyev/usestdlibvars v1.29.0 // indirect
 	github.com/securego/gosec/v2 v2.26.1 // indirect
-	github.com/shirou/gopsutil/v4 v4.26.4 // indirect
+	github.com/shirou/gopsutil/v4 v4.26.5 // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/sivchari/containedctx v1.0.3 // indirect
 	github.com/sonatard/noctx v0.5.1 // indirect
@@ -279,7 +279,7 @@ require (
 	github.com/ultraware/whitespace v0.2.0 // indirect
 	github.com/uudashr/gocognit v1.2.1 // indirect
 	github.com/uudashr/iface v1.4.2 // indirect
-	github.com/vektra/mockery/v3 v3.7.0 // indirect
+	github.com/vektra/mockery/v3 v3.7.1 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
@@ -304,17 +304,17 @@ require (
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.50.0 // indirect
+	golang.org/x/crypto v0.51.0 // indirect
 	golang.org/x/exp v0.0.0-20260212183809-81e46e3db34a // indirect
 	golang.org/x/exp/typeparams v0.0.0-20260209203927-2842357ff358 // indirect
-	golang.org/x/mod v0.36.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.44.0 // indirect
-	golang.org/x/telemetry v0.0.0-20260508192327-42602be52be6 // indirect
-	golang.org/x/term v0.42.0 // indirect
-	golang.org/x/text v0.36.0 // indirect
-	golang.org/x/tools v0.45.0 // indirect
-	golang.org/x/vuln v1.3.0 // indirect
+	golang.org/x/mod v0.37.0 // indirect
+	golang.org/x/sync v0.21.0 // indirect
+	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/telemetry v0.0.0-20260611141451-d61e87d5f4a3 // indirect
+	golang.org/x/term v0.43.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
+	golang.org/x/tools v0.46.0 // indirect
+	golang.org/x/vuln v1.4.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
