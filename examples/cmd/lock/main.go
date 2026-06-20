@@ -10,74 +10,123 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/arielsrv/dynamolock"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/urfave/cli"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/wait"
+	"github.com/urfave/cli/v2"
+
+	"github.com/arielsrv/dynamolock/v2"
+)
+
+const (
+	leaseDurationSec   = 3
+	tableCapacityUnits = 5
 )
 
 func main() {
 	log.SetPrefix("lock: ")
 	log.SetFlags(0)
-	app := cli.NewApp()
-	app.HideVersion = true
-	app.Name = "lock"
-	app.Usage = "lock and execute given command"
-	app.Flags = []cli.Flag{
-		cli.BoolFlag{Name: "release-on-error,r"},
-		cli.BoolFlag{Name: "wait-for-lock,w"},
-		cli.StringFlag{
-			Name:  "table",
-			Value: "locks",
+	app := &cli.App{
+		Name:  "lock",
+		Usage: "lock and execute given command using dynamolock v2",
+		Flags: []cli.Flag{
+			&cli.BoolFlag{Name: "release-on-error, r"},
+			&cli.BoolFlag{Name: "wait-for-lock, w"},
+			&cli.StringFlag{
+				Name:  "table",
+				Value: "locks",
+			},
+		},
+		Action: func(c *cli.Context) error {
+			lockName := c.Args().First()
+			if lockName == "" {
+				return errors.New("missing lock name")
+			}
+			cmd := c.Args().Tail()
+			if len(cmd) == 0 {
+				return errors.New("missing command")
+			}
+			tableName := c.String("table")
+
+			ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+			defer stop()
+
+			// Start DynamoDB Local container if no endpoint is provided
+			endpoint := os.Getenv("DYNAMODB_ENDPOINT")
+			if endpoint == "" {
+				log.Println("no DYNAMODB_ENDPOINT provided, starting DynamoDB Local container...")
+				container, err := startDynamoDBContainer(ctx)
+				if err != nil {
+					return fmt.Errorf("cannot start DynamoDB container: %w", err)
+				}
+				defer func() {
+					if err := container.Terminate(ctx); err != nil {
+						log.Printf("failed to terminate container: %v", err)
+					}
+				}()
+				host, err := container.Host(ctx)
+				if err != nil {
+					return fmt.Errorf("cannot get container host: %w", err)
+				}
+				port, err := container.MappedPort(ctx, "8000")
+				if err != nil {
+					return fmt.Errorf("cannot get container port: %w", err)
+				}
+				endpoint = fmt.Sprintf("http://%s:%s", host, port.Port())
+				os.Setenv("DYNAMODB_ENDPOINT", endpoint)
+				log.Printf("DynamoDB Local started at %s", endpoint)
+			}
+
+			client, err := dialDynamoDB(ctx, tableName)
+			if err != nil {
+				return err
+			}
+			defer client.Close()
+
+			if err = createTable(ctx, client, tableName); err != nil {
+				return err
+			}
+
+			lock, err := grabLock(ctx, client, lockName, c.Bool("wait-for-lock"))
+			if err != nil {
+				return err
+			}
+
+			return runCommand(ctx, lock, c.Bool("release-on-error"), cmd)
 		},
 	}
-	app.Action = func(c *cli.Context) error {
-		lockName := c.Args().First()
-		if lockName == "" {
-			return errors.New("missing lock name")
-		}
-		cmd := c.Args().Tail()
-		if len(cmd) == 0 {
-			return errors.New("missing command")
-		}
-		tableName := c.String("table")
-		client, err := dialDynamoDB(tableName)
-		if err != nil {
-			return err
-		}
-		if err := createTable(client, tableName); err != nil {
-			return err
-		}
-		lock, err := grabLock(client, lockName, c.Bool("wait-for-lock"))
-		if err != nil {
-			return err
-		}
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-		trap := make(chan os.Signal, 1)
-		signal.Notify(trap, os.Interrupt)
-		go func() {
-			<-trap
-			cancel()
-		}()
-		return runCommand(ctx, lock, c.Bool("release-on-error"), cmd)
-	}
+
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func dialDynamoDB(tableName string) (*dynamolock.Client, error) {
-	session, err := session.NewSession()
+func dialDynamoDB(ctx context.Context, tableName string) (*dynamolock.Client, error) {
+	cfg, err := config.LoadDefaultConfig(ctx,
+		config.WithRegion("us-west-2"),
+		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
+			Value: aws.Credentials{
+				AccessKeyID:     "fakeMyKeyId",
+				SecretAccessKey: "fakeSecretAccessKey",
+			},
+		}),
+	)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create AWS session: %w", err)
+		return nil, fmt.Errorf("cannot load AWS config: %w", err)
 	}
+
 	client, err := dynamolock.New(
-		dynamodb.New(session),
+		dynamodb.NewFromConfig(cfg, func(o *dynamodb.Options) {
+			if os.Getenv("DYNAMODB_ENDPOINT") != "" {
+				o.BaseEndpoint = aws.String(os.Getenv("DYNAMODB_ENDPOINT"))
+			}
+		}),
 		tableName,
-		dynamolock.WithLeaseDuration(3*time.Second),
+		dynamolock.WithLeaseDuration(leaseDurationSec*time.Second),
 		dynamolock.WithHeartbeatPeriod(1*time.Second),
 		dynamolock.WithPartitionKeyName("key"),
 	)
@@ -87,33 +136,47 @@ func dialDynamoDB(tableName string) (*dynamolock.Client, error) {
 	return client, nil
 }
 
-func createTable(client *dynamolock.Client, tableName string) error {
-	_, err := client.CreateTable(tableName,
-		dynamolock.WithProvisionedThroughput(&dynamodb.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(5),
-			WriteCapacityUnits: aws.Int64(5),
+func startDynamoDBContainer(ctx context.Context) (testcontainers.Container, error) {
+	req := testcontainers.ContainerRequest{
+		Image:        "amazon/dynamodb-local:latest",
+		ExposedPorts: []string{"8000/tcp"},
+		WaitingFor:   wait.ForListeningPort("8000/tcp"),
+	}
+	return testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
+}
+
+func createTable(ctx context.Context, client *dynamolock.Client, tableName string) error {
+	_, err := client.CreateTableWithContext(
+		ctx, tableName,
+		dynamolock.WithProvisionedThroughput(&types.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(tableCapacityUnits),
+			WriteCapacityUnits: aws.Int64(tableCapacityUnits),
 		}),
 		dynamolock.WithCustomPartitionKeyName("key"),
 	)
 	if err != nil {
-		var awsErr awserr.RequestFailure
-		isTableAlreadyCreatedError := errors.As(err, &awsErr) && awsErr.StatusCode() == 400 && awsErr.Message() == "Cannot create preexisting table"
-		if !isTableAlreadyCreatedError {
-			return fmt.Errorf("cannot create dynamolock client table: %w", err)
+		if _, ok := errors.AsType[*types.ResourceInUseException](err); ok {
+			return nil
 		}
+		return fmt.Errorf("cannot create dynamolock client table: %w", err)
 	}
 	return nil
 }
 
-func grabLock(client *dynamolock.Client, lockName string, wait bool) (*dynamolock.Lock, error) {
+func grabLock(ctx context.Context, client *dynamolock.Client, lockName string, wait bool) (*dynamolock.Lock, error) {
 	for {
-		lock, err := client.AcquireLock(lockName, dynamolock.WithDeleteLockOnRelease())
-		if err != nil && wait {
-			continue
-		} else if err != nil {
+		lock, err := client.AcquireLockWithContext(ctx, lockName, dynamolock.WithDeleteLockOnRelease())
+		if err != nil {
+			if wait && ctx.Err() == nil {
+				time.Sleep(1 * time.Second)
+				continue
+			}
 			return nil, fmt.Errorf("cannot lock %s: %w", lockName, err)
 		}
-		return lock, err
+		return lock, nil
 	}
 }
 
@@ -134,7 +197,7 @@ func runCommand(ctx context.Context, lock *dynamolock.Lock, releaseOnError bool,
 				log.Println("cannot release lock after failure:", lockErr)
 			}
 		}
-		return fmt.Errorf("error: %w", err)
+		return fmt.Errorf("command error: %w", err)
 	}
 	if lockErr := lock.Close(); lockErr != nil {
 		log.Println("cannot release lock after completion:", lockErr)
