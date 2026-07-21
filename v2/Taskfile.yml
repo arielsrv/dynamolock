@@ -1,0 +1,64 @@
+# https://taskfile.dev
+version: "3"
+
+vars:
+  PKG: ./...
+
+tasks:
+  default:
+    desc: Run linters and tests (with race)
+    cmds:
+      - task: lint
+      - task: test:race
+
+  update:
+    desc: Check for and apply dependency updates
+    cmds:
+      - go tool go-mod-upgrade
+      - go mod tidy
+      - go mod verify
+
+  update:check:
+    desc: List available dependency updates without applying them
+    cmds:
+      - go list -u -m all
+
+  fmt:
+    desc: Format code with gofumpt
+    cmds:
+      - go tool gofumpt -w -l .
+
+  lint:
+    desc: Run golangci-lint (with --fix) and gofumpt
+    cmds:
+      - go tool golangci-lint run --fix
+      - task: fmt
+
+  vuln:
+    desc: Scan for known vulnerabilities
+    cmds:
+      - go tool govulncheck {{.PKG}}
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test -v -count 1 {{.PKG}}
+
+  test:race:
+    desc: Run tests with the race detector
+    cmds:
+      - go test -v -race -count 1 {{.PKG}}
+
+  test:cover:
+    desc: Run tests with race and coverage report
+    cmds:
+      - go test -v -race -count 1 -coverprofile=coverage.out {{.PKG}}
+      - go tool cover -func=coverage.out
+
+  ci:
+    desc: Full check - updates, lint, vuln and tests with race
+    cmds:
+      - task: update:check
+      - task: lint
+      - task: vuln
+      - task: test:race

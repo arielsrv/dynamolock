@@ -86,4 +86,4 @@ limitations under the License.
 //
 // This package is covered by this SLA:
 // https://github.com/arielsrv/public/blob/master/SLA.md
-package dynamolock // import "github.com/arielsrv/dynamolock/v2"
+package dynamolock
