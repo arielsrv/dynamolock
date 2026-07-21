@@ -18,6 +18,7 @@ package dynamolock
 
 import (
 	"errors"
+	"maps"
 	"sync"
 	"time"
 
@@ -107,9 +108,7 @@ func (l *Lock) OwnerName() string {
 func (l *Lock) AdditionalAttributes() map[string]*dynamodb.AttributeValue {
 	addAttr := make(map[string]*dynamodb.AttributeValue)
 	if l != nil {
-		for k, v := range l.additionalAttributes {
-			addAttr[k] = v
-		}
+		maps.Copy(addAttr, l.additionalAttributes)
 	}
 	return addAttr
 }

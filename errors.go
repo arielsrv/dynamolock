@@ -17,6 +17,7 @@ limitations under the License.
 package dynamolock
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -55,12 +56,13 @@ func (e *LockNotGrantedError) Unwrap() error {
 }
 
 func parseDynamoDBError(err error, msg string) error {
-	if aerr, ok := err.(awserr.Error); ok {
-		switch aerr.Code() {
+	var awsErr awserr.Error
+	if errors.As(err, &awsErr) {
+		switch awsErr.Code() {
 		case dynamodb.ErrCodeConditionalCheckFailedException:
 			return &LockNotGrantedError{
 				msg:   msg,
-				cause: aerr,
+				cause: awsErr,
 			}
 		}
 	}

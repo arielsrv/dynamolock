@@ -539,7 +539,7 @@ func TestSortKeyDeleteLockOnRelease(t *testing.T) {
 func TestSortKeyCustomRefreshPeriod(t *testing.T) {
 	t.Parallel()
 	svc := dynamodb.NewFromConfig(defaultConfig(t))
-	var buf bytes.Buffer
+	var buf lockStepBuffer
 	logger := &writerLogger{w: &buf}
 	c, err := dynamolock.New(
 		svc,
