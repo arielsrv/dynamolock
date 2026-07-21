@@ -346,7 +346,7 @@ func (c *Client) acquireLock(ctx context.Context, opt *acquireLockOptions) (*Loc
 			c.partitionKeyName, attrOwnerName, attrLeaseDuration, attrRecordVersionNumber, attrData)
 	}
 
-	getLockOptions := getLockOptions{
+	getLockOpts := getLockOptions{
 		partitionKeyName:     opt.partitionKey,
 		deleteLockOnRelease:  opt.deleteLockOnRelease,
 		sessionMonitor:       opt.sessionMonitor,
@@ -357,28 +357,28 @@ func (c *Client) acquireLock(ctx context.Context, opt *acquireLockOptions) (*Loc
 		failIfLocked:         opt.failIfLocked,
 	}
 
-	getLockOptions.millisecondsToWait = defaultBuffer
+	getLockOpts.millisecondsToWait = defaultBuffer
 	if opt.additionalTimeToWaitForLock > 0 {
-		getLockOptions.millisecondsToWait = opt.additionalTimeToWaitForLock
+		getLockOpts.millisecondsToWait = opt.additionalTimeToWaitForLock
 	}
 
-	getLockOptions.refreshPeriodDuration = defaultBuffer
+	getLockOpts.refreshPeriodDuration = defaultBuffer
 	if opt.refreshPeriod > 0 {
-		getLockOptions.refreshPeriodDuration = opt.refreshPeriod
+		getLockOpts.refreshPeriodDuration = opt.refreshPeriod
 	}
 
 	for {
-		l, err := c.storeLock(ctx, &getLockOptions)
+		l, err := c.storeLock(ctx, &getLockOpts)
 		if err != nil {
 			return nil, err
 		} else if l != nil {
 			return l, nil
 		}
-		c.logger.Println(ctx, "Sleeping for a refresh period of ", getLockOptions.refreshPeriodDuration)
+		c.logger.Println(ctx, "Sleeping for a refresh period of ", getLockOpts.refreshPeriodDuration)
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		case <-time.After(getLockOptions.refreshPeriodDuration):
+		case <-time.After(getLockOpts.refreshPeriodDuration):
 		}
 	}
 }
