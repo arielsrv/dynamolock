@@ -3,11 +3,11 @@ module github.com/arielsrv/dynamolock/v2
 go 1.26.5
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.43.1
+	github.com/aws/aws-sdk-go-v2 v1.43.2
 	github.com/aws/aws-sdk-go-v2/config v1.32.32
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.31
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.8.55
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.62.1
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.8.56
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.62.2
 	github.com/testcontainers/testcontainers-go v0.43.0
 	github.com/urfave/cli/v2 v2.27.7
 )
@@ -48,14 +48,14 @@ require (
 	github.com/apex/log v1.9.0 // indirect
 	github.com/ashanbrown/forbidigo/v2 v2.3.1 // indirect
 	github.com/ashanbrown/makezero/v2 v2.2.1 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.20.55 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.20.56 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.32 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.32 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.32 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.33 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.33 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.33 // indirect
-	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.36.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.36.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.14 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.12.9 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.12.10 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.32 // indirect
 	github.com/aws/aws-sdk-go-v2/service/signin v1.5.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.33.1 // indirect
