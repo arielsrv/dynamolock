@@ -1,13 +1,13 @@
 module github.com/arielsrv/dynamolock/v2
 
-go 1.26.5
+go 1.26.6
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.43.4
-	github.com/aws/aws-sdk-go-v2/config v1.32.35
-	github.com/aws/aws-sdk-go-v2/credentials v1.19.34
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.8.59
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.63.1
+	github.com/aws/aws-sdk-go-v2 v1.43.6
+	github.com/aws/aws-sdk-go-v2/config v1.32.37
+	github.com/aws/aws-sdk-go-v2/credentials v1.19.36
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.8.61
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.63.3
 	github.com/testcontainers/testcontainers-go v0.44.0
 	github.com/urfave/cli/v2 v2.27.7
 )
@@ -48,20 +48,20 @@ require (
 	github.com/apex/log v1.9.0 // indirect
 	github.com/ashanbrown/forbidigo/v2 v2.3.1 // indirect
 	github.com/ashanbrown/makezero/v2 v2.2.1 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.20.59 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.35 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.35 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.35 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.36 // indirect
-	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.36.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.15 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.12.12 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.35 // indirect
-	github.com/aws/aws-sdk-go-v2/service/signin v1.5.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.33.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.38.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.45.4 // indirect
-	github.com/aws/smithy-go v1.27.6 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.20.61 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.37 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.37 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.37 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.38 // indirect
+	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.36.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.17 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.12.14 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.37 // indirect
+	github.com/aws/aws-sdk-go-v2/service/signin v1.5.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.33.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.38.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.45.6 // indirect
+	github.com/aws/smithy-go v1.27.8 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitfield/gotestdox v0.2.2 // indirect
 	github.com/bkielbasa/cyclop v1.2.3 // indirect
@@ -101,7 +101,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/denis-tingaikin/go-header v0.5.0 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
-	github.com/dkorunic/betteralign v0.14.3 // indirect
+	github.com/dkorunic/betteralign v0.14.4 // indirect
 	github.com/dlclark/regexp2 v1.12.0 // indirect
 	github.com/dnephin/pflag v1.0.7 // indirect
 	github.com/docker/go-connections v0.7.0 // indirect
@@ -279,7 +279,7 @@ require (
 	github.com/ultraware/whitespace v0.2.0 // indirect
 	github.com/uudashr/gocognit v1.2.1 // indirect
 	github.com/uudashr/iface v1.4.2 // indirect
-	github.com/vektra/mockery/v3 v3.7.2 // indirect
+	github.com/vektra/mockery/v3 v3.7.3 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
@@ -306,14 +306,14 @@ require (
 	golang.org/x/crypto v0.54.0 // indirect
 	golang.org/x/exp v0.0.0-20260212183809-81e46e3db34a // indirect
 	golang.org/x/exp/typeparams v0.0.0-20260209203927-2842357ff358 // indirect
-	golang.org/x/mod v0.38.0 // indirect
+	golang.org/x/mod v0.40.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/telemetry v0.0.0-20260708182218-49f421fb7959 // indirect
+	golang.org/x/telemetry v0.0.0-20260811182544-a038080d80e5 // indirect
 	golang.org/x/term v0.45.0 // indirect
 	golang.org/x/text v0.40.0 // indirect
-	golang.org/x/tools v0.48.0 // indirect
-	golang.org/x/vuln v1.6.0 // indirect
+	golang.org/x/tools v0.49.0 // indirect
+	golang.org/x/vuln v1.7.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
