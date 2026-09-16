@@ -1,6 +1,6 @@
 module github.com/arielsrv/dynamolock/_examples/cmd/lock
 
-go 1.26.6
+go 1.27.1
 
 require (
 	github.com/arielsrv/dynamolock/v2 v2.0.0

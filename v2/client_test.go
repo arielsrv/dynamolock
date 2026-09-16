@@ -48,12 +48,10 @@ var (
 func TestMain(m *testing.M) {
 	ctx := context.Background()
 	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: testcontainers.ContainerRequest{
-			Image:        "amazon/dynamodb-local:latest",
-			ExposedPorts: []string{"8000/tcp"},
-			WaitingFor:   wait.ForListeningPort("8000/tcp"),
-		},
-		Started: true,
+		Image:        "amazon/dynamodb-local:latest",
+		ExposedPorts: []string{"8000/tcp"},
+		WaitingFor:   wait.ForListeningPort("8000/tcp"),
+		Started:      true,
 	})
 	if err != nil {
 		panic("cannot start DynamoDB container: " + err.Error())
